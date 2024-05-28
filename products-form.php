@@ -22,7 +22,9 @@ $sqlCreateProducts = "CREATE TABLE IF NOT EXISTS products (
 )";
 
 if (mysqli_query($conn, $sqlCreateProducts)) {
-    echo "Products table created successfully.<br>";
+    if (mysqli_affected_rows($conn) > 0) {
+        echo "Products table created successfully.<br>";
+    }
 } else {
     echo "Error creating products table: " . mysqli_error($conn);
 }

@@ -59,10 +59,10 @@ if (mysqli_query($conn, $sqlCreateBrands)) {
                         echo "<div class='alert alert-danger mt-5' role='alert'>Brand name cannot contain numbers</div>";
                     } else {
                         // Insert new brand data from form
-                        $sqlInsert = "INSERT INTO brands (brand_name) VALUES ('$brandName')";
+                        $sqlInsert = "INSERT INTO brands (brand) VALUES ('$brandName')";
 
                         if (mysqli_query($conn, $sqlInsert)) {
-                            echo "New record created successfully.<br>";
+                            echo "<p class='text-bg-success p-2 mt-4'>New record created successfully.</p><br>";
                         } else {
                             echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
                         }
