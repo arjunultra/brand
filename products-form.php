@@ -108,7 +108,7 @@ $brandOptions = "";
 if (mysqli_num_rows($resultBrands) > 0) {
     while ($row = mysqli_fetch_assoc($resultBrands)) {
         $brandId = $row['id'];
-        $brandName = $row['brand'];
+        $brandName = $row['brand_name'];
         $brandOptions .= "<option value='$brandName'>$brandName</option>";
     }
 }

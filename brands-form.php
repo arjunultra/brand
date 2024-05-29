@@ -6,29 +6,38 @@ $dbname = "srisw";
 
 // Create connection
 $conn = mysqli_connect($servername, $username, $password, $dbname);
-
 // Check connection
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    die("Connection
+    failed: " . mysqli_connect_error());
+}
+// update functionality
+$update_id = "";
+$edit_brand = "";
+
+if (isset($_REQUEST['update_id'])) {
+    $update_id = $_REQUEST['update_id'];
+    $query = " SELECT * FROM brands WHERE id='" . $update_id . "'";
+    $result = $conn->query($query);
+    if ($result) {
+        foreach ($result as $row) {
+            $update_id = $row['id'];
+            $edit_brand = $row['brand_name'];
+        }
+    }
 }
 
 // Create brands table if not exists
-$sqlCreateBrands = "CREATE TABLE IF NOT EXISTS brands (
-    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    brand_name VARCHAR(255) NOT NULL
-)";
-
-if (mysqli_query($conn, $sqlCreateBrands)) {
-    // Check if the table was actually created or it already existed
+$sqlCreateBrands = " CREATE TABLE IF NOT EXISTS brands ( id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, brand_name
+    VARCHAR(255) NOT NULL )";
+if (mysqli_query($conn, $sqlCreateBrands)) { // Check if the table was actually created or it already existed 
     if (mysqli_affected_rows($conn) > 0) {
         echo "Brands table created successfully.<br>";
     }
 } else {
     echo "Error creating brands table: " . mysqli_error($conn);
 }
-
 ?>
-
 <!DOCTYPE html>
 <html>
 
@@ -45,9 +54,12 @@ if (mysqli_query($conn, $sqlCreateBrands)) {
     <form method="POST" class="form w-100 text-center">
         <div class="form-group">
             <label for="brand-name">Brand Name:</label>
-            <input type="text" id="brand-name" name="brand_name" class="form-control">
+            <input
+                value="<?php echo isset($_POST['brand_name']) ? htmlspecialchars($_POST['brand_name']) : ''; ?><?php echo $edit_brand; ?>"
+                type="text" id="brand-name" name="brand_name" class="form-control">
             <div class="brandname-error">
                 <?php
+
                 // Assuming you're submitting data to this same PHP script
                 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_name'])) {
                     // Validate brand name
@@ -59,7 +71,7 @@ if (mysqli_query($conn, $sqlCreateBrands)) {
                         echo "<div class='alert alert-danger mt-5' role='alert'>Brand name cannot contain numbers</div>";
                     } else {
                         // Insert new brand data from form
-                        $sqlInsert = "INSERT INTO brands (brand) VALUES ('$brandName')";
+                        $sqlInsert = "INSERT INTO brands (brand_name) VALUES ('$brandName')";
 
                         if (mysqli_query($conn, $sqlInsert)) {
                             echo "<p class='text-bg-success p-2 mt-4'>New record created successfully.</p><br>";
@@ -75,6 +87,7 @@ if (mysqli_query($conn, $sqlCreateBrands)) {
         </div>
         <br>
         <input class="btn btn-primary" type="submit" value="Submit">
+        <a class="btn btn-dark" href="brands-table.php">Go to Table</a>
     </form>
 </body>
 
