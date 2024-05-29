@@ -28,37 +28,77 @@ if (mysqli_query($conn, $sqlCreateProducts)) {
 } else {
     echo "Error creating products table: " . mysqli_error($conn);
 }
+//  Error Handling
+$productNameError = $brandError = $rateRangeError = $selectedRateError = "";
 
-// Assuming you're submitting data to this same PHP script
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_name'])) {
-    // Insert new product data from form
-    $productName = mysqli_real_escape_string($conn, $_POST['product_name']);
-    $brand = mysqli_real_escape_string($conn, $_POST['brand']);
-    $rateRange = mysqli_real_escape_string($conn, $_POST['rate_range']);
-    $selectedRate = (int) $_POST['selected_rate'];
-    $rateRangeParts = explode("-", $rateRange);
-    $rateRangeMin = (int) str_replace(",", "", $rateRangeParts[0]);
-    $rateRangeMax = (int) str_replace(",", "", $rateRangeParts[1]);
-    $selectedRateValid = true;
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $isValid = true;
 
-    // Validate selected rate against rate range
-    if ($selectedRate < $rateRangeMin || $selectedRate > $rateRangeMax) {
-        $selectedRateValid = false;
+    // Sanitize and validate product name
+    if (empty($_POST['product_name'])) {
+        $productNameError = "Product name is required.";
+        $isValid = false;
+    } else {
+        // Sanitize product name by removing harmful characters
+        $productName = filter_input(INPUT_POST, 'product_name', FILTER_SANITIZE_STRING);
+
+        // Validate product name for allowed characters
+        if (!preg_match("/^[a-zA-Z0-9 \-_]+$/", $productName)) {
+            $productNameError = "Product name contains invalid characters.";
+            $isValid = false;
+        }
     }
 
-    $sqlInsert = "INSERT INTO products (product_name, brand, rate_range, selected_rate) 
+    if (empty($_POST['brand']) || $_POST['brand'] == "") {
+        $brandError = "Brand is required.";
+        $isValid = false;
+    }
+
+    if (empty($_POST['rate_range']) || $_POST['rate_range'] == "") {
+        $rateRangeError = "Rate range is required.";
+        $isValid = false;
+    }
+
+    if (!isset($_POST['selected_rate']) || trim($_POST['selected_rate']) === '') {
+        $selectedRateError = "Selected rate is required.";
+        $isValid = false;
+    }
+
+    if ($isValid) {
+        // Assuming you're submitting data to this same PHP script
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['product_name'])) {
+            // Insert new product data from form
+            $productName = mysqli_real_escape_string($conn, $_POST['product_name']);
+            $brand = mysqli_real_escape_string($conn, $_POST['brand']);
+            $rateRange = mysqli_real_escape_string($conn, $_POST['rate_range']);
+            $selectedRate = (int) $_POST['selected_rate'];
+            $rateRangeParts = explode("-", $rateRange);
+            $rateRangeMin = (int) str_replace(",", "", $rateRangeParts[0]);
+            $rateRangeMax = (int) str_replace(",", "", $rateRangeParts[1]);
+            $selectedRateValid = true;
+
+            // Validate selected rate against rate range
+            if ($selectedRate < $rateRangeMin || $selectedRate > $rateRangeMax) {
+                $selectedRateValid = false;
+            }
+
+            $sqlInsert = "INSERT INTO products (product_name, brand, rate_range, selected_rate) 
                   VALUES ('$productName', '$brand', '$rateRange', $selectedRate)";
 
-    if (mysqli_query($conn, $sqlInsert) && $selectedRateValid) {
-        echo "New record created successfully.<br>";
-    } else {
-        if (!$selectedRateValid) {
-            echo "Error: Selected rate out of range.<br>";
-        } else {
-            echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
+            if (mysqli_query($conn, $sqlInsert) && $selectedRateValid) {
+                echo "New record created successfully.<br>";
+            } else {
+                if (!$selectedRateValid) {
+                    echo "Error: Selected rate out of range.<br>";
+                } else {
+                    echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
+                }
+            }
         }
     }
 }
+
+
 
 // Fetch brands data from brands table
 $sqlBrands = "SELECT * FROM brands";
@@ -76,6 +116,9 @@ if (mysqli_num_rows($resultBrands) > 0) {
 mysqli_close($conn);
 ?>
 
+
+
+
 <!DOCTYPE html>
 <html>
 
@@ -92,15 +135,21 @@ mysqli_close($conn);
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">
             <label for="product-name">Product Name:</label>
-            <input type="text" id="product-name" name="product_name" class="form-control" required>
+            <input type="text" id="product-name" name="product_name" class="form-control">
+            <?php if (!empty($productNameError)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $productNameError; ?></div>
+            <?php endif; ?>
         </div>
         <br>
         <div class="form-group">
             <label for="brand">Brand:</label>
-            <select id="brand" name="brand" class="form-control" required>
+            <select id="brand" name="brand" class="form-control">
                 <option value="">Select a brand</option>
                 <?php echo $brandOptions; ?>
             </select>
+            <?php if (!empty($brandError)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $brandError; ?></div>
+            <?php endif; ?>
         </div>
         <br>
         <div class="form-group">
@@ -111,11 +160,17 @@ mysqli_close($conn);
                 <option value="50,000-100,000">50,000-100,000</option>
                 <option value="100,000-500,000">100,000-500,000</option>
             </select>
+            <?php if (!empty($rateRangeError)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $rateRangeError; ?></div>
+            <?php endif; ?>
         </div>
         <br>
         <div class="form-group">
             <label for="selected-rate">Selected Rate:</label>
-            <input type="number" id="selected-rate" name="selected_rate" class="form-control" required>
+            <input type="number" id="selected-rate" name="selected_rate" class="form-control">
+            <?php if (!empty($selectedRateError)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $selectedRateError; ?></div>
+            <?php endif; ?>
         </div>
         <br>
         <input class="btn btn-primary" type="submit" value="Submit">
@@ -127,12 +182,19 @@ mysqli_close($conn);
         $rateRange = $_POST['rate_range'];
         $selectedRate = $_POST['selected_rate'];
         $rateRangeParts = explode("-", $rateRange);
-        $rateRangeMin = str_replace(",", "", $rateRangeParts[0]);
-        $rateRangeMax = str_replace(",", "", $rateRangeParts[1]);
+        if (count($rateRangeParts) == 2) {
+            $rateRangeMin = str_replace(",", "", $rateRangeParts[0]);
+            $rateRangeMax = str_replace(",", "", $rateRangeParts[1]);
+        } else {
+            // Handle incorrect format or provide default min and max values
+            $rateRangeMin = 0; // Default minimum
+            $rateRangeMax = 0; // Default maximum
+            // Optionally, add error handling or user feedback for incorrect format
+        }
         ?>
         <h2>Selected Details:</h2>
-        <p>Rate Range: <?php echo $rateRangeMin; ?> - <?php echo $rateRangeMax; ?></p>
-        <p>Selected Rate: <?php echo $selectedRate; ?></p>
+        <p>Rate Range: <?php echo htmlspecialchars($rateRangeMin); ?> - <?php echo htmlspecialchars($rateRangeMax); ?></p>
+        <p>Selected Rate: <?php echo htmlspecialchars($selectedRate); ?></p>
     <?php endif; ?>
 </body>
 
