@@ -59,7 +59,6 @@ if (mysqli_query($conn, $sqlCreateBrands)) { // Check if the table was actually 
                 type="text" id="brand-name" name="brand_name" class="form-control">
             <div class="brandname-error">
                 <?php
-
                 // Assuming you're submitting data to this same PHP script
                 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['brand_name'])) {
                     // Validate brand name
@@ -70,18 +69,39 @@ if (mysqli_query($conn, $sqlCreateBrands)) { // Check if the table was actually 
                     } else if (preg_match('/\d/', $brandName)) {
                         echo "<div class='alert alert-danger mt-5' role='alert'>Brand name cannot contain numbers</div>";
                     } else {
-                        // Insert new brand data from form
-                        $sqlInsert = "INSERT INTO brands (brand_name) VALUES ('$brandName')";
+                        // Check if we are updating or inserting
+                        if (!empty($update_id)) {
+                            // Prepare an update statement
+                            $sqlUpdate = "UPDATE brands SET brand_name = ? WHERE id = ?";
+                            $stmt = mysqli_prepare($conn, $sqlUpdate);
+                            mysqli_stmt_bind_param($stmt, "si", $brandName, $update_id);
 
-                        if (mysqli_query($conn, $sqlInsert)) {
-                            echo "<p class='text-bg-success p-2 mt-4'>New record created successfully.</p><br>";
+                            if (mysqli_stmt_execute($stmt)) {
+                                echo "<p class='text-bg-success p-2 mt-4'>Record updated successfully.</p><br>";
+                            } else {
+                                echo "Error: " . $sqlUpdate . "<br>" . mysqli_error($conn);
+                            }
                         } else {
-                            echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
+                            // Prepare an insert statement
+                            $sqlInsert = "INSERT INTO brands (brand_name) VALUES (?)";
+                            $stmt = mysqli_prepare($conn, $sqlInsert);
+                            mysqli_stmt_bind_param($stmt, "s", $brandName);
+
+                            if (mysqli_stmt_execute($stmt)) {
+                                echo "<p class='text-bg-success p-2 mt-4'>New record created successfully.</p><br>";
+                            } else {
+                                echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
+                            }
                         }
                     }
                 }
+                // Remember to close the prepared statement and the connection
+                if (isset($stmt)) {
+                    mysqli_stmt_close($stmt);
+                }
                 mysqli_close($conn);
                 ?>
+
 
             </div>
         </div>

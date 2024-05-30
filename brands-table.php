@@ -55,9 +55,9 @@ $result = mysqli_query($conn, $sql);
                                 <td><?php echo $row["id"] ?></td>
                                 <td><?php echo $row["brand_name"] ?></td>
                                 <td class='d-flex'> <a target="_blank" class="btn btn-outline-primary w-50 me-2"
-                                        href="brands-form.php?update_id=<?php echo $row['id']; ?>">Update</a>
+                                        href="brands-form.php?update_id=<?php echo $row['id']; ?>">UPDATE</a>
                                     <a class="btn btn-danger w-50"
-                                        href="feedback_table.php?delete_id=<?php echo $row['id']; ?>">DELETE</a>
+                                        href="brands-table.php?delete_id=<?php echo $row['id']; ?>">DELETE</a>
                                 </td>
                             </tr>
                         <?php }
@@ -71,7 +71,7 @@ $result = mysqli_query($conn, $sql);
             // Delete functionality
             if (isset($_GET['delete_id']) && !empty($_GET['delete_id'])) {
                 $delete_id = $_GET['delete_id'];
-                $sql = "DELETE FROM feedback_form WHERE id=$delete_id";
+                $sql = "DELETE FROM brands WHERE id=$delete_id";
                 if (mysqli_query($conn, $sql)) {
                     echo ("<h5 class='d-inline-block p-2 text-center text-danger fw-bold border border-danger'>Record Deleted Successfully</h2>");
                 } else {
