@@ -35,7 +35,7 @@ if (mysqli_num_rows($resultBrands) > 0) {
         $brandId = $row['id'];
         $brandName = $row['brand_name'];
         $isSelected = ($brandName) ? "selected" : "";
-        $brandOptions .= "<option value='$brandName' $isSelected>$brandName</option>";
+        $brandOptions .= "<option value='" . $brandName . "'>" . $brandName . "</option>";
     }
 }
 $sqlProducts = "SELECT * FROM products";
@@ -46,8 +46,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
     while ($row = mysqli_fetch_assoc($resultProducts)) {
         $productId = $row['id'];
         $productName = $row['product_name'];
-        $isSelected = ($productName) ? "selected" : "";
-        $productOptions .= "<option value='$productName' $isSelected>$productName</option>";
+        $productOptions .= "<option value='$productName'>$productName</option>";
     }
 }
 // Close connection
@@ -74,20 +73,26 @@ mysqli_close($conn);
             <label for="mobile">Mobile Number:</label>
             <input type="tel" id="mobile" name="mobile_number" class="form-control">
         </div>
-        <div class="form-group mt-5">
-            <!-- <label for="brand">Brand:</label> -->
-            <select id="brand" name="brand" class="">
-                <option value="">Select a brand</option>
-                <?php echo $brandOptions; ?>
-            </select>
+        <div class="select-container row mt-5">
+            <div id="brand-container" class="form-group col">
+                <!-- <label for="brand">Brand:</label> -->
+                <select id="brand-select" name="brand" class="mb-5" onchange="Javascript: getProducts();">
+                    <option selected value="">Select a brand</option>
+                    <?php echo $brandOptions; ?>
+                </select>
+            </div>
             <!-- <label for="product">Product:</label> -->
-            <select id="product" name="product" class="">
-                <option value="">Select a Product</option>
-                <?php echo $productOptions; ?>
-            </select>
+            <div class="col" id="product-container">
+                <select id="product-select" name="product" class="">
+                    <option selected value="">Select a Product</option>
+                    <?php echo $productOptions; ?>
+                </select>
+            </div>
             <!-- Add Button -->
-            <a id="addProduct" class="product-add-btn btn btn-success px-5 py-0 py-1" href="#">ADD</a>
+            <div class="btn-container mt-3 row"><a id="addProduct"
+                    class=" product-add-btn align-self-center btn btn-success mb-5 ms-2 ms-md-0" href="#">ADD</a></div>
         </div>
+
         <!-- Table -->
         <div class="container mt-5">
             <h2>Party Order Details</h2>
@@ -109,7 +114,29 @@ mysqli_close($conn);
         </div>
 
     </form>
-    <script></script>
+    <script>
+        function getProducts() {
+            let brand = "";
+            if ($("#brand-select").length > 0) {
+                brand = $("#brand-select").val();
+            }
+
+            var post_url = "party-form-changes.php?selected_brand=" + brand;
+
+            jQuery.ajax({
+                url: post_url, success: function (result) {
+                    if (result != "") {
+                        if ($("#product-container").length > 0) {
+                            $("#product-container").html(result);
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </body>
 
 </html>
