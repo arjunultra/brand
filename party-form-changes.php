@@ -16,7 +16,7 @@ if (isset($_REQUEST['selected_brand'])) {
     $brandName = "";
     $product_list = array();
     $brandName = $_REQUEST['selected_brand'];
-
+    // Filtering using SQL 
     $product_query = "";
     $product_query = "SELECT * FROM products WHERE brand='$brandName' ";
     if (!empty($product_query)) {
