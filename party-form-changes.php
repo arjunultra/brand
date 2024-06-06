@@ -1,4 +1,5 @@
 <?php
+// party-form-changes.php
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -20,7 +21,7 @@ if (isset($_REQUEST['selected_brand'])) {
     $product_query = "";
     $product_query = "SELECT * FROM products WHERE brand='$brandName' ";
     if (!empty($product_query)) {
-        $product_list = $conn->query($product_query);
+        $product_list = mysqli_query($conn, $product_query);
     }
 
     if (!empty($product_list)) { ?>
@@ -29,6 +30,23 @@ if (isset($_REQUEST['selected_brand'])) {
                 <option value="<?php echo $data['product_name'] ?>"><?php echo $data['product_name'] ?></option>
             <?php } ?>
         </select>
+    <?php }
+}
+if (isset($_REQUEST['selected_product'])) {
+    $product_name = "";
+    $brand_name = "";
+    $product_name = $_REQUEST['selected_product'];
+    $brand_name = $_REQUEST['selected_brands'];
+
+    if (!empty($product_name) && (!empty($brand_name))) { ?>
+        <tr>
+            <td><?php echo $brand_name ?>
+                <input type="hidden" name="brand_name[]" value="<?php echo $brand_name ?>">
+            </td>
+            <td><?php echo $product_name ?>
+                <input type="hidden" name="product_name[]" value="<?php echo $product_name ?>">
+            </td>
+        </tr>
     <?php }
 }
 ?>
