@@ -41,7 +41,9 @@ $update_id = "";
 $update_party_name = "";
 $update_party_mobile = "";
 $update_brand = "";
+$update_brands = [];
 $update_product = "";
+$update_products = [];
 
 if (isset($_REQUEST['update_id'])) {
     $update_id = $_REQUEST['update_id'];
@@ -99,8 +101,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["submit"])) {
         echo "<script>console.log('Update ID: $update_id');</script>";
     }
     if (!empty($update_id)) {
+        // Convert $productName array to a string if it's an array
+        $productNameStr = is_array($productName) ? implode(', ', $productName) : $productName;
+        $brandNameStr = is_array($brandName) ? implode(', ', $brandName) : $brandName;
         // If update_id is set, perform an update operation
-        $sqlUpdate = "UPDATE partyorder SET party_name='$partyName', party_mobile='$partyMobile', brand_name='$brandName', product_name=$productName WHERE id=$update_id";
+        $sqlUpdate = "UPDATE partyorder SET party_name='$partyName', party_mobile='$partyMobile', brand_name='$brandNameStr', product_name='$productNameStr' WHERE id=$update_id";
         if (mysqli_query($conn, $sqlUpdate)) {
             echo "<script>alert('Record updated successfully.');</script>";
         } else {
@@ -155,6 +160,9 @@ if (mysqli_num_rows($resultProducts) > 0) {
     <h1>Party Form</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">
+            <input type="hidden" name="update_id" value="<?php echo $update_id; ?>">
+        </div>
+        <div class="form-group">
             <label for="product-name">Party Name:</label>
             <input
                 value="<?php echo isset($_POST['party_name']) ? htmlspecialchars($_POST['party_name']) : ''; ?><?php echo $update_party_name; ?>"
@@ -180,7 +188,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
             </div>
             <!-- <label for="product">Product:</label> -->
             <div class="col" id="product-container">
-                <select id="products-select" name="product" class="">
+                <select id="product-select" name="product" class="">
                     <option selected value="">Select a Product</option>
                     <?php echo $productOptions; ?>
                 </select>
@@ -202,7 +210,23 @@ if (mysqli_num_rows($resultProducts) > 0) {
                         </tr>
                     </thead>
                     <tbody id="table-body">
+                        <?php
+                        if (!empty($update_brand)) {
+                            $update_brands = explode(',', $update_brand);
+                            $update_products = explode(',', $update_product);
+                            for ($i = 0; $i < count($update_brands); $i++) { ?>
+                                <tr>
+                                    <td><?php echo $update_brands[$i] ?>
+                                        <input type="hidden" name="brand_name[]" value="<?php echo $update_brands[$i] ?>">
+                                    </td>
+                                    <td><?php echo $update_products[$i] ?>
+                                        <input type="hidden" name="product_name[]" value="<?php echo $update_products[$i] ?>">
+                                    </td>
+                                    <?php
+                            }
+                        } ?>
 
+                        </tr>
                     </tbody>
                 </table>
             </div>

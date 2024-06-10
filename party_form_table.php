@@ -74,7 +74,7 @@ $result = mysqli_query($conn, $sql);
             // Delete functionality
             if (isset($_GET['delete_id']) && !empty($_GET['delete_id'])) {
                 $delete_id = $_GET['delete_id'];
-                $sql = "DELETE FROM products WHERE id=$delete_id";
+                $sql = "DELETE FROM partyorder WHERE id=$delete_id";
                 if (mysqli_query($conn, $sql)) {
                     echo ("<h5 class='d-inline-block p-2 text-center text-danger fw-bold border border-danger'>Record Deleted Successfully</h2>");
                 } else {
