@@ -22,18 +22,106 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-$sql = "CREATE TABLE IF NOT EXISTS partyorder (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    party_name VARCHAR(255)NOT NULL,
-    party_mobile BIGINT NOT NULL,
-    brand VARCHAR(255)NOT NULL,
-    product VARCHAR(255)NOT NULL
-)";
-
+// create table
+$sql = "CREATE TABLE IF NOT EXISTS partyorder(id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,party_name VARCHAR(255) NOT NULL,party_mobile VARCHAR(255),brand_name VARCHAR(255) NOT NULL,product_name VARCHAR(255) NOT NULL )";
 if (mysqli_query($conn, $sql)) {
+
     echo "Table partyorder created successfully";
 } else {
     echo "Error creating table: " . mysqli_error($conn);
+}
+// initializing variables
+$partyName = $partyMobile = $brandName = $productName = "";
+$isValid = true;
+// error handling variables
+$nameErr = $mobileErr = $brandErr = $productErr = "";
+// Update
+// Fetch party data for update if update_id is set
+$update_id = "";
+$update_party_name = "";
+$update_party_mobile = "";
+$update_brand = "";
+$update_product = "";
+
+if (isset($_REQUEST['update_id'])) {
+    $update_id = $_REQUEST['update_id'];
+    $updateQuery = "SELECT * FROM partyorder WHERE id='" . $update_id . "'";
+    $result = $conn->query($updateQuery);
+    if ($result) {
+        foreach ($result as $row) {
+            $update_party_name = $row['party_name'];
+            $update_party_mobile = $row['party_mobile'];
+            $update_brand = $row['brand_name'];
+            $update_product = $row['product_name'];
+        }
+    }
+}
+// creating variables
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["submit"])) {
+    $partyName = isset($_POST["party_name"]) ? $_POST["party_name"] : "";
+    $partyMobile = isset($_POST["party_mobile"]) ? $_POST["party_mobile"] : "";
+    $brandName = isset($_POST["brand_name"]) ? $_POST["brand_name"] : "";
+    $productName = isset($_POST["product_name"]) ? $_POST["product_name"] : "";
+    // Party Name Validation
+    if (empty($partyName) || !preg_match("/^[a-zA-Z]*$/", $partyName)) {
+        $nameErr = "Please enter a valid name !";
+        $isValid = false;
+    } else {
+        filter_input(INPUT_POST, 'party_name', FILTER_SANITIZE_STRING);
+        $isValid = true;
+    }
+    // Party Mobile Validation 
+    if (empty($partyMobile)) {
+        $mobileErr = "Please enter your mobile number";
+    } elseif (!preg_match('/^[0-9]{10}+$/', $partyMobile)) {
+        $mobileErr = "Entered mobile number is invalid";
+        $isValid = false;
+    } else {
+        filter_input(INPUT_POST, "party_mobile", FILTER_SANITIZE_STRING);
+        $isValid = true;
+    }
+    if ($isValid) {
+        $partyName = mysqli_real_escape_string($conn, $_POST['party_name']);
+        $partyMobile = mysqli_real_escape_string($conn, $_POST['party_mobile']);
+        if (is_array($_POST["brand_name"])) {
+            $stringValue = implode(',', $_POST['brand_name']);
+            $brandValue = mysqli_real_escape_string($conn, $stringValue);
+        } else {
+            $brandValue = mysqli_real_escape_string($conn, $_POST["brand_name"]);
+        }
+        if (is_array($_POST["product_name"])) {
+            $stringValue = implode(',', $_POST['product_name']);
+            $productValue = mysqli_real_escape_string($conn, $stringValue);
+        } else {
+            $productValue = mysqli_real_escape_string($conn, $_POST["product_name"]);
+        }
+        // debugging line
+        echo "<script>console.log('Update ID: $update_id');</script>";
+    }
+    if (!empty($update_id)) {
+        // If update_id is set, perform an update operation
+        $sqlUpdate = "UPDATE partyorder SET party_name='$partyName', party_mobile='$partyMobile', brand_name='$brandName', product_name=$productName WHERE id=$update_id";
+        if (mysqli_query($conn, $sqlUpdate)) {
+            echo "<script>alert('Record updated successfully.');</script>";
+        } else {
+            echo "Error: " . $sqlUpdate . "<br>" . mysqli_error($conn);
+        }
+    } else {
+        // Otherwise, perform an insert operation
+        $sqlInsert = "INSERT INTO partyorder (party_name, party_mobile, brand_name, product_name) 
+    VALUES ('$partyName', '$partyMobile', '$brandValue', '$productValue') ";
+        if (mysqli_query($conn, $sqlInsert)) {
+            echo "<script>
+    alert('New record created successfully.');
+  </script>";
+            header('Location: party-form.php');
+            exit;
+
+        } else {
+            echo "Error: " . $sqlInsert . "<br>" . mysqli_error($conn);
+        }
+    }
+
 }
 // Retrieve brands
 // Fetch brands data from brands table
@@ -60,8 +148,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
         $productOptions .= "<option value='$productName'>$productName</option>";
     }
 }
-// Close connection
-mysqli_close($conn);
+
 ?>
 
 <body>
@@ -69,9 +156,19 @@ mysqli_close($conn);
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">
             <label for="product-name">Party Name:</label>
-            <input type="text" id="party-name" name="party_name" class="form-control">
+            <input
+                value="<?php echo isset($_POST['party_name']) ? htmlspecialchars($_POST['party_name']) : ''; ?><?php echo $update_party_name; ?>"
+                type="text" id="party-name" name="party_name" class="form-control">
+            <?php if (!empty($nameErr)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $nameErr; ?></div>
+            <?php endif; ?>
             <label for="mobile">Mobile Number:</label>
-            <input type="tel" id="mobile" name="mobile_number" class="form-control">
+            <input
+                value="<?php echo isset($_POST['party_mobile']) ? htmlspecialchars($_POST['party_mobile']) : ''; ?><?php echo $update_party_mobile; ?>"
+                type="text" id="mobile" name="party_mobile" class="form-control">
+            <?php if (!empty($mobileErr)): ?>
+                <div class="alert alert-danger mt-2"><?php echo $mobileErr; ?></div>
+            <?php endif; ?>
         </div>
         <div class="select-container row mt-5">
             <div id="brand-container" class="form-group col">
@@ -110,18 +207,13 @@ mysqli_close($conn);
                 </table>
             </div>
         </div>
-
+        <input name="submit" class="btn btn-outline-danger" type="submit">
     </form>
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script>
         function getProducts(brand_id) {
-            // let brand = "";
-            // if ($("#brand-select").length > 0) {
-            //     brand = $("#brand-select").val();
-            // }
-
             var post_url = "party-form-changes.php?selected_brand=" + brand_id;
 
             jQuery.ajax({
@@ -160,8 +252,8 @@ mysqli_close($conn);
                 }
             });
         });
-    </script>
 
+    </script>
 
 </body>
 
