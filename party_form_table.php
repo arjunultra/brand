@@ -57,7 +57,8 @@ $result = mysqli_query($conn, $sql);
                                 <td><?php echo $row["party_mobile"] ?></td>
                                 <td><?php echo $row["brand_name"] ?></td>
                                 <td><?php echo $row["product_name"] ?></td>
-                                <td class='d-flex'> <a target="_blank" class="btn btn-outline-primary w-50 me-2"
+                                <td class='d-flex align-items-center justify-content-center'> <a target="_blank"
+                                        class="btn btn-outline-primary w-50 me-2"
                                         href="party-form.php?update_id=<?php echo $row['id']; ?>">UPDATE</a>
                                     <a class="btn btn-danger w-50"
                                         href="party_form_table.php?delete_id=<?php echo $row['id']; ?>">DELETE</a>

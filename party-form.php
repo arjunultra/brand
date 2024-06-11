@@ -260,11 +260,11 @@ if (mysqli_num_rows($resultProducts) > 0) {
             if ($("#product-select").length > 0) {
                 selectedProduct = $("#product-select").val();
             }
-            alert(selectedProduct)
+            // alert(selectedProduct)
             var post_url = "party-form-changes.php?selected_product=" + selectedProduct + "&selected_brands=" + selectedBrand;
             jQuery.ajax({
                 url: post_url, success: function (result) {
-                    alert(result)
+                    // alert(result)
                     if (result != "") {
                         if ($("#table-body").find("tr").length > 0) {
                             $("#table-body").find("tr:first").before(result);
@@ -278,6 +278,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
         });
 
     </script>
+    <script type="module" src="main.js"></script>
 
 </body>
 
