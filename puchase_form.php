@@ -23,7 +23,7 @@ if (!$conn) {
     failed: " . mysqli_connect_error());
 }
 // validation variables
-$dateValid = $rateValid = $qtyValid = $amountValid = "";
+$dateValid = $partyNameValid = $brandNameValid = $productNameValid = $rateValid = $qtyValid = $amountValid = "";
 // update variables
 $edit_date = "";
 $edit_party_name = "";
@@ -58,8 +58,11 @@ if (isset($_REQUEST['update_id'])) {
 }
 // post method starts
 // variables creation
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $date = trim($_POST['date_picker']);
+    $partyName = $_POST["parties_select"];
+    $brandName = trim($_POST["brand_select"]);
+    $pdtName = trim($_POST["product_select"]);
     $pdtRate = trim($_POST['rate_product']);
     $pdtQuantity = trim($_POST['quantity_product']);
     $pdtAmount = trim($_POST['amount_product']);
@@ -70,6 +73,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         filter_input(INPUT_POST, 'date_picker', FILTER_SANITIZE_STRING);
         $dateValid = "is-valid";
+    }
+    // Validate party name
+    if (empty($partyName)) {
+        $partyNameValid = "is-invalid";
+    } else {
+        $partyName = $_POST["parties_select"];
+    }
+
+    // Validate brand name
+    if (empty($brandName)) {
+        $brandNameValid = "is-invalid";
+    } else {
+        $brandNameValid = "is-valid";
+    }
+    // Validate product name
+    if (empty($pdtName)) {
+        $productNameValid = "is-invalid";
+    } else {
+        $productNameValid = "is-valid";
     }
 
     // Validate Rate
@@ -92,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $amountValid = "is-valid";
     }
 
-    if ($nameValid == "is-invalid" || $emailValid == "is-invalid" || $ageValid == "is-invalid") {
+    if ($dateValid == "is-invalid" || $partyNameValid == "is-invalid" || $brandNameValid == "is-invalid" || $productNameValid == "is-invalid" || $rateValid == "is-invalid" || $qtyValid == "is-invalid" || $amountValid == "is-invalid") {
         echo "<script>alert('All fields are required and must be valid.')</script>";
     } else {
         // Check if it's an update operation
@@ -100,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_id = $_POST['update_id'];
             $stmt = mysqli_prepare($conn, "UPDATE feedback_form SET name=?, email=?, age=? WHERE id=?");
             mysqli_stmt_bind_param($stmt, "ssii", $name, $email, $age, $update_id);
-            header("location:feedback_table.php");
+            // header("location:feedback_table.php");
         } else {
             // Attempt to create table only if it doesn't exist
             $sqlCreatePurchaseTable = " CREATE TABLE IF NOT EXISTS purchasetable ( id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,purchase_date DATE,party_name VARCHAR(255) NOT NULL,brand_name VARCHAR(255) NOT NULL,product_name VARCHAR(255) NOT NULL,product_rate VARCHAR(255) NOT NULL,product_qty VARCHAR(255) NOT NULL,product_amt VARCHAR(255) NOT NULL
@@ -109,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (mysqli_query($conn, $sqlCreatePurchaseTable)) {
                 // Inserting new data
                 $stmt = mysqli_prepare($conn, "INSERT INTO purchasetable (purchase_date, party_name,brand_name,product_name,product_rate,product_qty,product_amt) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "sssssss", $date, $partyName, $brandName, $productName, $productRate, $productQty, $productAmt);
+                mysqli_stmt_bind_param($stmt, "sssssss", $date, $partyName, $brandName, $pdtName, $pdtRate, $pdtQuantity, $pdtAmount);
 
             } else {
                 echo "Error creating table: " . mysqli_error($conn);
@@ -122,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_stmt_close($stmt);
             mysqli_close($conn);
         }
+
     }
 }
 // Retrieve brands
@@ -164,56 +187,100 @@ if (mysqli_num_rows($resultParties) > 0) {
 ?>
 
 <body class="d-flex flex-column justify-content-center align-items-center">
-    <h1>Purchase Form</h1>
-    <form class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <h1>Purchase <span id="main-title-span">Form</span></h1>
+    <form class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
         <div class="form-group">
             <label for="date">Date:</label>
             <input class="form-control" type="date" name="date_picker" id="date">
+            <!-- display validation feedback -->
+            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $dateValid == "is-invalid"): ?>
+                <div class="alert alert-danger">Please enter a valid date.</div>
+            <?php endif; ?>
         </div>
-        <div class="form-group">
-            <label for="parties">Parties:</label>
-            <select class="form-control" name="parties_select" id="ourParties">
-                <option selected value="">Select a party</option>
-                <?php echo $partiesOptions; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="brand">Brand:</label>
-            <select class="form-control" name="brand_select" id="ourBrands">
-                <option selected value="">Select a Brand</option>
-                <?php echo $brandOptions; ?>
-            </select>
-        </div>
+        <div class="d-flex" id="select-container">
+            <div class="form-group">
+                <label for="parties">Parties:</label>
+                <input type="hidden" name="party_name[]" id="party-name">
+                <select name="parties_select" id="ourParties">
+                    <option selected value="">Select a party</option>
+                    <?php echo $partiesOptions; ?>
+                </select>
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $partyNameValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please select a party !</div>
+                <?php endif; ?>
+            </div>
+            <div class="form-group">
+                <label for="brand">Brand:</label>
+                <input type="hidden" name="brand_name[]" id="brand-name">
+                <select name="brand_select" id="ourBrands">
 
-        <div class="form-group">
-            <label for="product">Product:</label>
-            <select class="form-control" name="product_select" id="ourProducts">
-                <option selected value="">Select a Product</option>
-                <?php echo $productOptions; ?>
-            </select>
+                    <option selected value="">Select a Brand</option>
+                    <?php echo $brandOptions; ?>
+                </select>
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $brandNameValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please select a brand !</div>
+                <?php endif; ?>
+            </div>
+
+            <div class="form-group" id="product-container">
+                <label for="product">Product:</label>
+                <input type="hidden" name="product_name[]" id="product-name">
+                <select name="product_select" id="product-select" onchange="getProducts(this.value)">
+                    <option selected value="">Select a Product</option>
+                    <?php echo $productOptions; ?>
+                </select>
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $productNameValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please select a product !</div>
+                <?php endif; ?>
+            </div>
         </div>
         <div class="form-group">
             <label for="rate">Rate:</label>
             <input placeholder="Product Rate" class="form-control" type="text" name="rate_product" id="rate">
+            <!-- display validation feedback -->
+            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $rateValid == "is-invalid"): ?>
+                <div class="alert alert-danger">Please enter a valid product rate !</div>
+            <?php endif; ?>
         </div>
         <div class="form-group">
             <label for="quantity">Quantity:</label>
             <input placeholder="Product Qty" class="form-control" type="text" name="quantity_product" id="quantity">
+            <!-- display validation feedback -->
+            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $qtyValid == "is-invalid"): ?>
+                <div class="alert alert-danger">Please enter a valid product quantity !</div>
+            <?php endif; ?>
         </div>
         <div class="form-group">
             <label for="amount">Amount:</label>
             <input placeholder="Product Amt" class="form-control" type="text" name="amount_product" id="amount">
+            <!-- display validation feedback -->
+            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $amountValid == "is-invalid"): ?>
+                <div class="alert alert-danger">This field cannot be empty!</div>
+            <?php endif; ?>
         </div>
         <!-- add button -->
         <button class="btn btn-outline-warning text-uppercase w-50 mt-3 d-block mx-auto" type="button">Add</button>
+        <button class="btn btn-danger d-block w-50 mx-auto mt-3" type="submit" name="submit">Submit</button>
 
     </form>
 
     </div>
 
     </form>
+    <!-- JQuery -->
+    <script src="./JS/jquery-3.7.1.min.js"></script>
     <!-- JS -->
-    <script type="module" src="bootstrap.bundle.min.js"></script>
+    <script type="module" src="JS/bootstrap.bundle.min.js"></script>
+    <script>
+        function getProducts(brand_id) {
+            let post_url = "purchase_form_changes.php?selected_brand=" + brand_id;
+            fetchAndDisplay(post_url, "#product-container");
+        }
+    </script>
+    <script src="./JS/filterProductsAjax.js"></script>
 
 </body>
 

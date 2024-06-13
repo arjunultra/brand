@@ -234,51 +234,16 @@ if (mysqli_num_rows($resultProducts) > 0) {
         <input name="submit" class="btn btn-outline-danger" type="submit">
     </form>
     <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="./JS/jquery-3.7.1.min.js"></script>
     <script>
         function getProducts(brand_id) {
-            var post_url = "party-form-changes.php?selected_brand=" + brand_id;
-
-            jQuery.ajax({
-                url: post_url, success: function (result) {
-                    if (result != "") {
-                        if ($("#product-container").length > 0) {
-                            $("#product-container").html(result);
-                        }
-                    }
-                }
-            });
+            let post_url = "party-form-changes.php?selected_brand=" + brand_id;
+            fetchAndDisplay(post_url, "#product-container");
         }
-
-        $('#addProduct').click(function () {
-            let selectedBrand = "";
-            if ($("#brand-select").length > 0) {
-                selectedBrand = $("#brand-select").val();
-            }
-            let selectedProduct = "";
-            if ($("#product-select").length > 0) {
-                selectedProduct = $("#product-select").val();
-            }
-            // alert(selectedProduct)
-            var post_url = "party-form-changes.php?selected_product=" + selectedProduct + "&selected_brands=" + selectedBrand;
-            jQuery.ajax({
-                url: post_url, success: function (result) {
-                    // alert(result)
-                    if (result != "") {
-                        if ($("#table-body").find("tr").length > 0) {
-                            $("#table-body").find("tr:first").before(result);
-                        } else {
-                            $("#table-body").append(result);
-                        }
-
-                    }
-                }
-            });
-        });
-
     </script>
-    <script type="module" src="main.js"></script>
+    <script src="./JS/filterProductsAjax.js"></script>
+    <script src="./JS/addToTableAjax.js"></script>
+    <!-- <script type="module" src="main.js"></script> -->
 
 </body>
 

@@ -58,6 +58,11 @@ h1.main-title {
   margin-top: 1em;
   text-shadow: 5px 3px 5px black;
 }
+span#main-title-span {
+  color: #674fbd;
+  text-shadow: 3px 3px 5px black;
+  font-weight: bold;
+}
 
 p {
   font-size: 1.125rem;
