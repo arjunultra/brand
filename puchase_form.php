@@ -184,6 +184,7 @@ if (mysqli_num_rows($resultParties) > 0) {
         $partiesOptions .= "<option value='$partiesName'>$partiesName</option>";
     }
 }
+
 ?>
 
 <body class="d-flex flex-column justify-content-center align-items-center">
@@ -197,11 +198,11 @@ if (mysqli_num_rows($resultParties) > 0) {
                 <div class="alert alert-danger">Please enter a valid date.</div>
             <?php endif; ?>
         </div>
-        <div class="d-flex" id="select-container">
-            <div class="form-group">
+        <div class="row gap-0" id="select-container">
+            <div class="form-group col-12 col-lg-4">
                 <label for="parties">Parties:</label>
                 <input type="hidden" name="party_name[]" id="party-name">
-                <select name="parties_select" id="ourParties">
+                <select class="w-100" name="parties_select" id="ourParties" onchange="getBrands(this.value)">
                     <option selected value="">Select a party</option>
                     <?php echo $partiesOptions; ?>
                 </select>
@@ -210,10 +211,10 @@ if (mysqli_num_rows($resultParties) > 0) {
                     <div class="alert alert-danger">Please select a party !</div>
                 <?php endif; ?>
             </div>
-            <div class="form-group">
+            <div class="form-group col-12 col-lg-4" id="brand-container">
                 <label for="brand">Brand:</label>
                 <input type="hidden" name="brand_name[]" id="brand-name">
-                <select name="brand_select" id="ourBrands">
+                <select class="w-100" name="brand_select" id="brand-select">
 
                     <option selected value="">Select a Brand</option>
                     <?php echo $brandOptions; ?>
@@ -224,10 +225,10 @@ if (mysqli_num_rows($resultParties) > 0) {
                 <?php endif; ?>
             </div>
 
-            <div class="form-group" id="product-container">
+            <div class="form-group col-12 col-lg-4" id="product-container">
                 <label for="product">Product:</label>
                 <input type="hidden" name="product_name[]" id="product-name">
-                <select name="product_select" id="product-select" onchange="getProducts(this.value)">
+                <select class="w-100" name="product_select" id="product-select" onchange="getProducts(this.value)">
                     <option selected value="">Select a Product</option>
                     <?php echo $productOptions; ?>
                 </select>
@@ -237,7 +238,7 @@ if (mysqli_num_rows($resultParties) > 0) {
                 <?php endif; ?>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group col">
             <label for="rate">Rate:</label>
             <input placeholder="Product Rate" class="form-control" type="text" name="rate_product" id="rate">
             <!-- display validation feedback -->
@@ -275,9 +276,9 @@ if (mysqli_num_rows($resultParties) > 0) {
     <!-- JS -->
     <script type="module" src="JS/bootstrap.bundle.min.js"></script>
     <script>
-        function getProducts(brand_id) {
-            let post_url = "purchase_form_changes.php?selected_brand=" + brand_id;
-            fetchAndDisplay(post_url, "#product-container");
+        function getBrands(party_id) {
+            let post_url = "purchase_form_changes.php?selected_party=" + party_id;
+            fetchAndDisplay(post_url, "#brand-select");
         }
     </script>
     <script src="./JS/filterProductsAjax.js"></script>
