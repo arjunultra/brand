@@ -22,13 +22,35 @@ if (isset($_REQUEST['selected_party'])) {
 
     if ($row) {
         $brandArr = explode(',', $row['brand_name']);
-
-        if (!empty($brandArr)) { ?>
-            <select id="brand-select" name="brand_select">
-                <?php foreach ($brandArr as $brandName) {
-                    $brandName = trim($brandName); // Trim to remove any accidental whitespace
+        $uniqueBrandArr = array_unique($brandArr);
+        if (!empty($uniqueBrandArr)) { ?>
+            <select class="w-100" id="brand-select" onchange="getProducts(this.value)" name="brand_select">
+                <option selected value="">Select a Brand</option>
+                <?php foreach ($uniqueBrandArr as $brandName) {
+                    $brandName = trim($brandName);
                     ?>
                     <option value="<?php echo ($brandName); ?>"><?php echo ($brandName); ?></option>
+                <?php } ?>
+            </select>
+        <?php }
+    }
+}
+if (isset($_REQUEST['selected_brand'])) {
+    $brandName = $_REQUEST['selected_brand'];
+    $productList = [];
+    $productArr = [];
+    $product_query = "SELECT product_name FROM products WHERE brand = '$brandName'";
+    $productList = mysqli_query($conn, $product_query);
+
+    if ($productList != null) {
+        // $productArr = explode(',', $row['product_name']);
+        if (!empty($productList)) { ?>
+            <select class="w-100" id="products-select" name="products_select">
+                <option selected value="">Select a Product</option>
+                <?php foreach ($productList as $data) {
+                    // $productName = trim($productName);
+                    ?>
+                    <option value="<?php echo ($data['product_name']); ?>"><?php echo ($data['product_name']); ?></option>
                 <?php } ?>
             </select>
         <?php }

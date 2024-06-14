@@ -239,6 +239,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
         function getProducts(brand_id) {
             let post_url = "party-form-changes.php?selected_brand=" + brand_id;
             fetchAndDisplay(post_url, "#product-container");
+
         }
     </script>
     <script src="./JS/filterProductsAjax.js"></script>

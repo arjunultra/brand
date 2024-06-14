@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $date = trim($_POST['date_picker']);
     $partyName = $_POST["parties_select"];
     $brandName = trim($_POST["brand_select"]);
-    $pdtName = trim($_POST["product_select"]);
+    $productName = trim($_POST["product_select"]);
     $pdtRate = trim($_POST['rate_product']);
     $pdtQuantity = trim($_POST['quantity_product']);
     $pdtAmount = trim($_POST['amount_product']);
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $brandNameValid = "is-valid";
     }
     // Validate product name
-    if (empty($pdtName)) {
+    if (empty($productName)) {
         $productNameValid = "is-invalid";
     } else {
         $productNameValid = "is-valid";
@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             if (mysqli_query($conn, $sqlCreatePurchaseTable)) {
                 // Inserting new data
                 $stmt = mysqli_prepare($conn, "INSERT INTO purchasetable (purchase_date, party_name,brand_name,product_name,product_rate,product_qty,product_amt) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "sssssss", $date, $partyName, $brandName, $pdtName, $pdtRate, $pdtQuantity, $pdtAmount);
+                mysqli_stmt_bind_param($stmt, "sssssss", $date, $partyName, $brandName, $productName, $pdtRate, $pdtQuantity, $pdtAmount);
 
             } else {
                 echo "Error creating table: " . mysqli_error($conn);
@@ -214,11 +214,12 @@ if (mysqli_num_rows($resultParties) > 0) {
             <div class="form-group col-12 col-lg-4" id="brand-container">
                 <label for="brand">Brand:</label>
                 <input type="hidden" name="brand_name[]" id="brand-name">
-                <select class="w-100" name="brand_select" id="brand-select">
-
-                    <option selected value="">Select a Brand</option>
-                    <?php echo $brandOptions; ?>
-                </select>
+                <div id="brand-select-container">
+                    <select class="w-100" name="brand_select" id="brand-select" onchange="getProducts(this.value)">
+                        <option selected value="">Select a Brand</option>
+                        <?php echo $brandOptions; ?>
+                    </select>
+                </div>
                 <!-- display validation feedback -->
                 <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $brandNameValid == "is-invalid"): ?>
                     <div class="alert alert-danger">Please select a brand !</div>
@@ -228,10 +229,12 @@ if (mysqli_num_rows($resultParties) > 0) {
             <div class="form-group col-12 col-lg-4" id="product-container">
                 <label for="product">Product:</label>
                 <input type="hidden" name="product_name[]" id="product-name">
-                <select class="w-100" name="product_select" id="product-select" onchange="getProducts(this.value)">
-                    <option selected value="">Select a Product</option>
-                    <?php echo $productOptions; ?>
-                </select>
+                <div id="product-select-container">
+                    <select class="w-100" name="products_select" id="products-select">
+                        <option selected value="">Select a Product</option>
+                        <?php echo $productOptions; ?>
+                    </select>
+                </div>
                 <!-- display validation feedback -->
                 <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $productNameValid == "is-invalid"): ?>
                     <div class="alert alert-danger">Please select a product !</div>
@@ -278,7 +281,12 @@ if (mysqli_num_rows($resultParties) > 0) {
     <script>
         function getBrands(party_id) {
             let post_url = "purchase_form_changes.php?selected_party=" + party_id;
-            fetchAndDisplay(post_url, "#brand-select");
+            fetchAndDisplay(post_url, "#brand-select-container");
+        }
+        function getProducts(brand_id) {
+
+            let post_url = "purchase_form_changes.php?&selected_brand=" + brand_id;
+            fetchAndDisplay(post_url, "#product-select-container");
         }
     </script>
     <script src="./JS/filterProductsAjax.js"></script>
