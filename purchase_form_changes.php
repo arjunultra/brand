@@ -45,7 +45,7 @@ if (isset($_REQUEST['selected_brand'])) {
     if ($productList != null) {
         // $productArr = explode(',', $row['product_name']);
         if (!empty($productList)) { ?>
-            <select class="w-100" id="products-select" name="products_select">
+            <select class="w-100" id="products-select" name="products_select" onchange="fetchProductRate(this.value)">
                 <option selected value="">Select a Product</option>
                 <?php foreach ($productList as $data) {
                     // $productName = trim($productName);
@@ -56,3 +56,20 @@ if (isset($_REQUEST['selected_brand'])) {
         <?php }
     }
 }
+// fetching product rate based on selected product
+if (isset($_REQUEST['selected_product'])) {
+    $productName = "";
+    $product_list = array();
+    $productName = $_REQUEST['selected_product'];
+    // Filtering using SQL 
+    $product_query = "";
+    $product_query = "SELECT selected_rate FROM products WHERE product_name='$productName' ";
+    if (!empty($product_query)) {
+        $product_list = mysqli_query($conn, $product_query);
+    }
+
+    if (!empty($product_list)) { ?>
+        <input class="form-control" id="product-rate" name="product_rate" <?php foreach ($product_list as $data) { ?>             <?php echo $data['selected_rate'] ?>         <?php } ?> value="<?php echo $data['selected_rate'] ?>">
+    <?php }
+
+} ?>

@@ -243,7 +243,8 @@ if (mysqli_num_rows($resultParties) > 0) {
         </div>
         <div class="form-group col">
             <label for="rate">Rate:</label>
-            <input placeholder="Product Rate" class="form-control" type="text" name="rate_product" id="rate">
+            <div id="pdt-rate-container"><input placeholder="Product Rate" class="form-control" type="text"
+                    name="product_rate" id="product-rate"></div>
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $rateValid == "is-invalid"): ?>
                 <div class="alert alert-danger">Please enter a valid product rate !</div>
@@ -287,6 +288,10 @@ if (mysqli_num_rows($resultParties) > 0) {
 
             let post_url = "purchase_form_changes.php?&selected_brand=" + brand_id;
             fetchAndDisplay(post_url, "#product-select-container");
+        }
+        function fetchProductRate(product_id) {
+            let post_url = "purchase_form_changes.php?&selected_product=" + product_id;
+            fetchAndDisplay(post_url, "#pdt-rate-container");
         }
     </script>
     <script src="./JS/filterProductsAjax.js"></script>
