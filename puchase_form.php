@@ -363,16 +363,6 @@ if (mysqli_num_rows($resultParties) > 0) {
             let post_url = "purchase_form_changes.php?&selected_product=" + product_id;
             fetchAndDisplay(post_url, "#pdt-rate-container");
         }
-        function calculateAmount(qty) {
-
-            let pdtQty = document.getElementById('product-quantity');
-            qty = pdtQty.value;
-            let pdtRate = document.getElementById('product-rate');
-
-            let totalAmount = pdtRate.value * pdtQty.value;
-            pdtAmount.value = totalAmount;
-
-        }
         function calculateSubtotal() {
             let amount = 0; let totalAmount = 0;
             if ($('.product-row').length > 0) {
@@ -396,7 +386,17 @@ if (mysqli_num_rows($resultParties) > 0) {
 
         }
 
+        // JS code for value updates
+        function calculateAmount(qty) {
 
+            let pdtQty = document.getElementById('product-quantity');
+            qty = pdtQty.value;
+            let pdtRate = document.getElementById('product-rate');
+
+            let totalAmount = pdtRate.value * pdtQty.value;
+            pdtAmount.value = totalAmount;
+
+        }
 
     </script>
     <script src="./JS/filterProductsAjax.js"></script>

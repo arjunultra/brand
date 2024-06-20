@@ -85,7 +85,7 @@ if (isset($_REQUEST['selected_products'])) {
     $row_index = $_REQUEST['row_index'];
     $selected_product_amount = $_REQUEST['product_amount'];
     if (!empty($selected_brand) && (!empty($selected_product))) { ?>
-        <tr class="product_row row<?php echo $row_index ?>">
+        <tr class="product-row row<?php echo $row_index ?>">
             <td><?php echo $row_index ?></td>
             <td><?php echo $selected_brand ?>
                 <input type="hidden" name="brands_name[]" value="<?php echo $selected_brand ?>">
