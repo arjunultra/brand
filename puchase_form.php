@@ -51,7 +51,7 @@ if (isset($_REQUEST['update_id'])) {
             $edit_brand_name = $row['brand_select'];
             $edit_product_name = $row['product_select'];
             $edit_product_rate = $row['rate_product'];
-            $edit_product_qty = $row['quantity_product'];
+            $edit_product_qty = $row['product_quantity'];
 
         }
     }
@@ -59,13 +59,13 @@ if (isset($_REQUEST['update_id'])) {
 // post method starts
 // variables creation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
-    $date = trim($_POST['date_picker']);
-    $partyName = $_POST["parties_select"];
-    $brandName = trim($_POST["brand_select"]);
-    $productName = trim($_POST["product_select"]);
-    $pdtRate = trim($_POST['rate_product']);
-    $pdtQuantity = trim($_POST['quantity_product']);
-    $pdtAmount = trim($_POST['amount_product']);
+    $date = ($_POST['purchase_date']);
+    $partyName = ($_POST["parties_select"]);
+    $brandName = ($_POST["brands_name"]);
+    $productName = ($_POST["products_name"]);
+    $pdtRate = ($_POST['products_rate']);
+    $pdtQuantity = ($_POST['products_quantity']);
+    $pdtAmount = ($_POST['products_amount']);
 
     // Validate Date
     if (empty($date) || (!preg_match("/^(\d{4})-(\d{2})-(\d{2})$/", $date))) {
@@ -75,43 +75,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $dateValid = "is-valid";
     }
     // Validate party name
-    if (empty($partyName)) {
+    if (empty($partyName) || !preg_match("/^[A-Za-z]+([ '-][A-Za-z]+)*$/", $partyName)) {
         $partyNameValid = "is-invalid";
     } else {
-        $partyName = $_POST["parties_select"];
+        $partyNameValid = "is-valid";
     }
 
     // Validate brand name
-    if (empty($brandName)) {
+    if (isset($brandName) && is_array($brandName)) {
+        foreach ($brandName as $brandItem) {
+            if (!empty($brandItem) || (preg_match("/^[A-Za-z0-9]+$/", $brandItem))) {
+                $brandNameValid = "is-valid";
+            }
+        }
+    } else {
         $brandNameValid = "is-invalid";
-    } else {
-        $brandNameValid = "is-valid";
     }
+    print_r($brandName);
+    print_r($brandNameValid);
+
     // Validate product name
-    if (empty($productName)) {
-        $productNameValid = "is-invalid";
+    if (isset($productName) && is_array($productName)) {
+        foreach ($productName as $productItem) {
+            if (!empty($productItem) || (preg_match("/^[A-Za-z0-9]+$/", $productItem))) {
+                $productNameValid = "is-valid";
+            }
+        }
     } else {
-        $productNameValid = "is-valid";
+        $productNameValid = "is-invalid";
     }
 
     // Validate Rate
-    if (empty($pdtRate) || !preg_match("/^-?\d+(\.\d+)?$/", $pdtRate)) {
+    if (isset($pdtRate) && is_array($pdtRate)) {
+        foreach ($pdtRate as $rateItem) {
+            if (!empty($rateItem) || (preg_match("/^-?\d+(\.\d+)?$/", $rateItem))) {
+                $rateValid = "is-valid";
+            }
+        }
+    } else {
         $rateValid = "is-invalid";
-    } else {
-        $rateValid = "is-valid";
     }
-
     // Validate Qty
-    if (empty($pdtQuantity) || !preg_match("/^\d+$/", $pdtQuantity)) {
-        $qtyValid = "is-invalid";
+    if (isset($pdtQuantity) && is_array($pdtQuantity)) {
+        foreach ($pdtQuantity as $quantityItem) {
+            if (!empty($quantityItem) || (preg_match("/^-?\d+(\.\d+)?$/", $quantityItem))) {
+                $qtyValid = "is-valid";
+            }
+        }
     } else {
-        $qtyValid = "is-valid";
+        $qtyValid = "is-invalid";
     }
     // Validate Amount
-    if (empty($pdtAmount) || !preg_match("/^-?\d+(\.\d+)?$/", $pdtAmount)) {
-        $amountValid = "is-invalid";
+    if (isset($pdtAmount) && is_array($pdtAmount)) {
+        foreach ($pdtAmount as $amountItem) {
+            if (!empty($amountItem) || (preg_match("/^-?\d+(\.\d+)?$/", $amountItem))) {
+                $amountValid = "is-valid";
+            }
+        }
     } else {
-        $amountValid = "is-valid";
+        $amountValid = "is-invalid";
     }
 
     if ($dateValid == "is-invalid" || $partyNameValid == "is-invalid" || $brandNameValid == "is-invalid" || $productNameValid == "is-invalid" || $rateValid == "is-invalid" || $qtyValid == "is-invalid" || $amountValid == "is-invalid") {
@@ -126,26 +148,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         } else {
             // Attempt to create table only if it doesn't exist
             $sqlCreatePurchaseTable = " CREATE TABLE IF NOT EXISTS purchasetable ( id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,purchase_date DATE,party_name VARCHAR(255) NOT NULL,brand_name VARCHAR(255) NOT NULL,product_name VARCHAR(255) NOT NULL,product_rate VARCHAR(255) NOT NULL,product_qty VARCHAR(255) NOT NULL,product_amt VARCHAR(255) NOT NULL
-     )";
+ )";
+            //  check variables are not arrays before insert
+            // Function to handle array to string conversion
+            function ensure_string($var)
+            {
+                if (is_array($var)) {
+                    return implode(", ", $var);
+                }
+                return trim($var);  // Ensuring the variable is a string and trimming it
+            }
+
+            // Ensuring all variables are strings
+            $dateStr = ensure_string($date);
+            $partyNameStr = ensure_string($partyName);
+            $brandNameStr = ensure_string($brandName);
+            $productNameStr = ensure_string($productName);
+            $pdtRateStr = ensure_string($pdtRate);
+            $pdtQuantityStr = ensure_string($pdtQuantity);
+            $pdtAmountStr = ensure_string($pdtAmount);
 
             if (mysqli_query($conn, $sqlCreatePurchaseTable)) {
                 // Inserting new data
-                $stmt = mysqli_prepare($conn, "INSERT INTO purchasetable (purchase_date, party_name,brand_name,product_name,product_rate,product_qty,product_amt) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                mysqli_stmt_bind_param($stmt, "sssssss", $date, $partyName, $brandName, $productName, $pdtRate, $pdtQuantity, $pdtAmount);
-
-            } else {
-                echo "Error creating table: " . mysqli_error($conn);
+                $query = "INSERT INTO purchasetable (purchase_date, party_name, brand_name, product_name, product_rate, product_qty, product_amt) 
+VALUES ('$dateStr', '$partyNameStr', '$brandNameStr', '$productNameStr', '$pdtRateStr', '$pdtQuantityStr', '$pdtAmountStr')";
+                if (mysqli_query($conn, $query)) {
+                    // Successful insert
+                    echo "Data inserted successfully.";
+                } else {
+                    // Error handling
+                    echo "Error: " . mysqli_error($conn);
+                }
             }
-        }
-        // Execute and close statement
-        if (!mysqli_stmt_execute($stmt)) {
-            echo "Error: " . mysqli_stmt_error($stmt);
-        } else {
-            mysqli_stmt_close($stmt);
-            mysqli_close($conn);
+
         }
 
     }
+
 }
 // Retrieve brands
 $sqlBrands = "SELECT * FROM brands";
@@ -189,10 +228,10 @@ if (mysqli_num_rows($resultParties) > 0) {
 
 <body class="d-flex flex-column justify-content-center align-items-center">
     <h1>Purchase <span id="main-title-span">Form</span></h1>
-    <form class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+    <form id="purchase-form" class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
         <div class="form-group">
             <label for="date">Date:</label>
-            <input class="form-control" type="date" name="date_picker" id="date">
+            <input class="form-control" type="date" name="purchase_date" id="purchase-date">
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $dateValid == "is-invalid"): ?>
                 <div class="alert alert-danger">Please enter a valid date.</div>
@@ -202,7 +241,7 @@ if (mysqli_num_rows($resultParties) > 0) {
             <div class="form-group col-12 col-lg-4">
                 <label for="parties">Parties:</label>
                 <input type="hidden" name="party_name[]" id="party-name">
-                <select class="w-100" name="parties_select" id="ourParties" onchange="getBrands(this.value)">
+                <select class="w-100" name="parties_select" id="parties-select" onchange="getBrands(this.value)">
                     <option selected value="">Select a party</option>
                     <?php echo $partiesOptions; ?>
                 </select>
@@ -213,7 +252,7 @@ if (mysqli_num_rows($resultParties) > 0) {
             </div>
             <div class="form-group col-12 col-lg-4" id="brand-container">
                 <label for="brand">Brand:</label>
-                <input type="hidden" name="brand_name[]" id="brand-name">
+                <input type="hidden" name="brands_name" id="brand-name">
                 <div id="brand-select-container">
                     <select class="w-100" name="brand_select" id="brand-select" onchange="getProducts(this.value)">
                         <option selected value="">Select a Brand</option>
@@ -228,9 +267,9 @@ if (mysqli_num_rows($resultParties) > 0) {
 
             <div class="form-group col-12 col-lg-4" id="product-container">
                 <label for="product">Product:</label>
-                <input type="hidden" name="product_name[]" id="product-name">
+                <input type="hidden" name="product_name" id="product-name">
                 <div id="product-select-container">
-                    <select class="w-100" name="products_select" id="products-select">
+                    <select class="w-100" name="products_select" id="product-select">
                         <option selected value="">Select a Product</option>
                         <?php echo $productOptions; ?>
                     </select>
@@ -244,7 +283,7 @@ if (mysqli_num_rows($resultParties) > 0) {
         <div class="form-group col">
             <label for="rate">Rate:</label>
             <div id="pdt-rate-container"><input placeholder="Product Rate" class="form-control" type="text"
-                    name="product_rate" id="product-rate"></div>
+                    name="product_rate" id="product-rate" value=""></div>
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $rateValid == "is-invalid"): ?>
                 <div class="alert alert-danger">Please enter a valid product rate !</div>
@@ -252,7 +291,8 @@ if (mysqli_num_rows($resultParties) > 0) {
         </div>
         <div class="form-group">
             <label for="quantity">Quantity:</label>
-            <input placeholder="Product Qty" class="form-control" type="text" name="quantity_product" id="quantity">
+            <input onkeyup="calculateAmount()" placeholder="Product Qty" class="form-control" type="text"
+                name="product_quantity" id="product-quantity">
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $qtyValid == "is-invalid"): ?>
                 <div class="alert alert-danger">Please enter a valid product quantity !</div>
@@ -260,42 +300,108 @@ if (mysqli_num_rows($resultParties) > 0) {
         </div>
         <div class="form-group">
             <label for="amount">Amount:</label>
-            <input placeholder="Product Amt" class="form-control" type="text" name="amount_product" id="amount">
+            <input placeholder="Product Amount" class="form-control" type="text" name="product_amount"
+                id="product-amount">
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $amountValid == "is-invalid"): ?>
                 <div class="alert alert-danger">This field cannot be empty!</div>
             <?php endif; ?>
         </div>
         <!-- add button -->
-        <button class="btn btn-outline-warning text-uppercase w-50 mt-3 d-block mx-auto" type="button">Add</button>
+        <button class="btn btn-outline-warning text-uppercase w-50 mt-3 d-block mx-auto" id="addrow-btn"
+            type="button">Add</button>
+        <!-- table -->
+        <div class="container mt-5">
+            <h2>Party Order Details</h2>
+            <div id="productTable" class="table-responsive">
+                <table id="purchase-table" class="table table-striped table-hover table-bordered">
+                    <input type="hidden" id="row_count" name="row_count" value="0">
+                    <thead class="table-dark bg-primary">
+                        <tr>
+                            <th>S.No</th>
+                            <th>Brand Name</th>
+                            <th>Product Name</th>
+                            <th>Product Rate</th>
+                            <th>Product Quantity</th>
+                            <th>Grand Total</th>
+                            <th>Function</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                    </tbody>
+                    <tfoot>
+                        <td colspan="4" class="text-center">Subtotal</td>
+                        <td>value</td>
+                        <td id="sub-total"></td>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
         <button class="btn btn-danger d-block w-50 mx-auto mt-3" type="submit" name="submit">Submit</button>
 
     </form>
-
-    </div>
-
-    </form>
+    <?php
+    mysqli_close($conn);
+    ?>
     <!-- JQuery -->
     <script src="./JS/jquery-3.7.1.min.js"></script>
     <!-- JS -->
-    <script type="module" src="JS/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="JS/bootstrap.bundle.min.js"></script>
     <script>
+        const addrowBtn = document.getElementById('addrow-btn')
+        let pdtAmount = document.getElementById('product-amount');
         function getBrands(party_id) {
             let post_url = "purchase_form_changes.php?selected_party=" + party_id;
             fetchAndDisplay(post_url, "#brand-select-container");
         }
         function getProducts(brand_id) {
 
-            let post_url = "purchase_form_changes.php?&selected_brand=" + brand_id;
+            let post_url = "purchase_form_changes.php?&selected_brands=" + brand_id;
             fetchAndDisplay(post_url, "#product-select-container");
         }
         function fetchProductRate(product_id) {
             let post_url = "purchase_form_changes.php?&selected_product=" + product_id;
             fetchAndDisplay(post_url, "#pdt-rate-container");
         }
+        function calculateAmount(qty) {
+
+            let pdtQty = document.getElementById('product-quantity');
+            qty = pdtQty.value;
+            let pdtRate = document.getElementById('product-rate');
+
+            let totalAmount = pdtRate.value * pdtQty.value;
+            pdtAmount.value = totalAmount;
+
+        }
+        function calculateSubtotal() {
+            let amount = 0; let totalAmount = 0;
+            if ($('.product-row').length > 0) {
+                $('.product-row').find('.amount').each(function () {
+                    amount = $(this).html();
+                    totalAmount = parseInt(amount) + parseInt(totalAmount);
+                });
+            }
+            if (totalAmount != 0 && totalAmount != "") {
+                if ($('#sub-total').length > 0) {
+                    $('#sub-total').html(totalAmount);
+                }
+            }
+        }
+        function DeleteRow(row_index) {
+            if (row_index != "") {
+                if ($('.row' + row_index).length) {
+                    $('.row' + row_index).remove();
+                }
+            }
+
+        }
+
+
+
     </script>
     <script src="./JS/filterProductsAjax.js"></script>
-
+    <script src="./JS/purchase-form-table-ajax.js"></script>
+    <script src="./JS/calculateSubtotal.js"></script>
 </body>
 
 </html>

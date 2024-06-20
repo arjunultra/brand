@@ -186,15 +186,15 @@ mysqli_close($conn);
             <label for="rate-range">Rate Range:</label>
             <select id="rate-range" name="rate_range" class="form-control">
                 <option value="">Select a rate range</option>
-                <option value="10,000-50,000" <?php if ($update_rate_range == '10,000-50,000')
+                <option value="100-500" <?php if ($update_rate_range == '100-500')
                     echo 'selected'; ?>>
-                    10,000-50,000</option>
-                <option value="50,000-100,000" <?php if ($update_rate_range == '50,000-100,000')
+                    ₹100-₹500</option>
+                <option value="500-1,000" <?php if ($update_rate_range == '500-1,000')
                     echo 'selected'; ?>>
-                    50,000-100,000</option>
-                <option value="100,000-500,000" <?php if ($update_rate_range == '100,000-500,000')
+                    ₹500-₹1000</option>
+                <option value="1,000-2,000" <?php if ($update_rate_range == '1,000-2,000')
                     echo 'selected'; ?>>
-                    100,000-500,000</option>
+                    ₹1,000-₹2,000</option>
             </select>
             <?php if (!empty($rateRangeError)): ?>
                 <div class="alert alert-danger mt-2"><?php echo $rateRangeError; ?></div>

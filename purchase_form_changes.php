@@ -35,8 +35,8 @@ if (isset($_REQUEST['selected_party'])) {
         <?php }
     }
 }
-if (isset($_REQUEST['selected_brand'])) {
-    $brandName = $_REQUEST['selected_brand'];
+if (isset($_REQUEST['selected_brands'])) {
+    $brandName = $_REQUEST['selected_brands'];
     $productList = [];
     $productArr = [];
     $product_query = "SELECT product_name FROM products WHERE brand = '$brandName'";
@@ -72,4 +72,43 @@ if (isset($_REQUEST['selected_product'])) {
         <input class="form-control" id="product-rate" name="product_rate" <?php foreach ($product_list as $data) { ?>             <?php echo $data['selected_rate'] ?>         <?php } ?> value="<?php echo $data['selected_rate'] ?>">
     <?php }
 
-} ?>
+}
+// add to table
+if (isset($_REQUEST['selected_products'])) {
+    $selected_product = "";
+    $selected_brand = "";
+    $product_rate = "";
+    $selected_product = $_REQUEST['selected_products'];
+    $selected_brand = $_REQUEST['selected_brand'];
+    $selected_product_rate = $_REQUEST['product_rate'];
+    $selected_product_quantity = $_REQUEST['product_quantity'];
+    $row_index = $_REQUEST['row_index'];
+    $selected_product_amount = $_REQUEST['product_amount'];
+    if (!empty($selected_brand) && (!empty($selected_product))) { ?>
+        <tr class="product_row row<?php echo $row_index ?>">
+            <td><?php echo $row_index ?></td>
+            <td><?php echo $selected_brand ?>
+                <input type="hidden" name="brands_name[]" value="<?php echo $selected_brand ?>">
+            </td>
+            <td><?php echo $selected_product ?>
+                <input type="hidden" name="products_name[]" value="<?php echo $productName ?>">
+            </td>
+            <td>
+                <input onkeyup="updateAmount().call(this)" class="w-75 product-rate" type="text" name="products_rate[]"
+                    value="<?php echo $selected_product_rate ?>">
+            </td>
+            <td>
+                <input onkeyup="updateAmount.call(this)" class="w-75 product-quantity" type="text" name="products_quantity[]"
+                    value="<?php echo $selected_product_quantity ?>">
+            </td>
+            <td class="amount"><?php echo $selected_product_amount ?>
+                <input readonly type="hidden" name="products_amount[]" value="<?php echo $selected_product_amount ?>">
+            </td>
+            <td class="function">
+                <input type="hidden" name="function">
+                <button type="button" class="btn btn-outline-danger delete-btn"
+                    onclick="DeleteRow(<?php echo $row_index; ?>)">Delete</button>
+            </td>
+        </tr>
+    <?php }
+}
