@@ -66,6 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $pdtRate = ($_POST['products_rate']);
     $pdtQuantity = ($_POST['products_quantity']);
     $pdtAmount = ($_POST['products_amount']);
+    // GT
+
 
     // Validate Date
     if (empty($date) || (!preg_match("/^(\d{4})-(\d{2})-(\d{2})$/", $date))) {
@@ -167,6 +169,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             $pdtRateStr = ensure_string($pdtRate);
             $pdtQuantityStr = ensure_string($pdtQuantity);
             $pdtAmountStr = ensure_string($pdtAmount);
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                $pdtAmountStr = isset($_POST['sub_total']) ? $_POST['sub_total'] : 0;
+            }
 
             if (mysqli_query($conn, $sqlCreatePurchaseTable)) {
                 // Inserting new data
@@ -300,6 +305,7 @@ if (mysqli_num_rows($resultParties) > 0) {
         </div>
         <div class="form-group">
             <label for="amount">Amount:</label>
+            <input type="hidden" id="sub-total-hidden" name="sub_total">
             <input placeholder="Product Amount" class="form-control" type="text" name="product_amount"
                 id="product-amount">
             <!-- display validation feedback -->
@@ -374,6 +380,7 @@ if (mysqli_num_rows($resultParties) > 0) {
             if (totalAmount != 0 && totalAmount != "") {
                 if ($('#sub-total').length > 0) {
                     $('#sub-total').html(totalAmount);
+                    $('#sub-total-hidden').val(totalAmount); // Update the hidden input field
                 }
             }
         }

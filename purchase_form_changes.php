@@ -91,7 +91,7 @@ if (isset($_REQUEST['selected_products'])) {
                 <input type="hidden" name="brands_name[]" value="<?php echo $selected_brand ?>">
             </td>
             <td><?php echo $selected_product ?>
-                <input type="hidden" name="products_name[]" value="<?php echo $productName ?>">
+                <input type="hidden" name="products_name[]" value="<?php echo $selected_product ?>">
             </td>
             <td>
                 <input onkeyup="" class="w-75 product-rate" type="text" name="products_rate[]"
