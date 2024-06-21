@@ -86,7 +86,7 @@ if (isset($_REQUEST['selected_products'])) {
     $selected_product_amount = $_REQUEST['product_amount'];
     if (!empty($selected_brand) && (!empty($selected_product))) { ?>
         <tr class="product-row row<?php echo $row_index ?>">
-            <td><?php echo $row_index ?></td>
+            <td class="row-index"><?php echo $row_index ?></td>
             <td><?php echo $selected_brand ?>
                 <input type="hidden" name="brands_name[]" value="<?php echo $selected_brand ?>">
             </td>
@@ -94,11 +94,11 @@ if (isset($_REQUEST['selected_products'])) {
                 <input type="hidden" name="products_name[]" value="<?php echo $productName ?>">
             </td>
             <td>
-                <input onkeyup="updateAmount().call(this)" class="w-75 product-rate" type="text" name="products_rate[]"
+                <input onkeyup="" class="w-75 product-rate" type="text" name="products_rate[]"
                     value="<?php echo $selected_product_rate ?>">
             </td>
             <td>
-                <input onkeyup="updateAmount.call(this)" class="w-75 product-quantity" type="text" name="products_quantity[]"
+                <input onkeyup="" class="w-75 product-quantity" type="text" name="products_quantity[]"
                     value="<?php echo $selected_product_quantity ?>">
             </td>
             <td class="amount"><?php echo $selected_product_amount ?>

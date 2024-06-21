@@ -40,7 +40,7 @@ $(document).ready(function () {
         alert(result);
         if (result != "") {
           if ($("#table-body").find("tr").length > 0) {
-            $("#table-body").find("tr:first").before(result);
+            $("#table-body").find("tr:first").after(result);
             calculateSubtotal();
           } else {
             $("#table-body").append(result);

@@ -330,9 +330,9 @@ if (mysqli_num_rows($resultParties) > 0) {
                     <tbody id="table-body">
                     </tbody>
                     <tfoot>
-                        <td colspan="4" class="text-center">Subtotal</td>
-                        <td>value</td>
-                        <td id="sub-total"></td>
+                        <td colspan="5" class="text-center">Subtotal</td>
+                        <td class="fw-bold">value</td>
+                        <td class="fw-bold display-6" id="sub-total"></td>
                     </tfoot>
                 </table>
             </div>
@@ -385,8 +385,6 @@ if (mysqli_num_rows($resultParties) > 0) {
             }
 
         }
-
-        // JS code for value updates
         function calculateAmount(qty) {
 
             let pdtQty = document.getElementById('product-quantity');
@@ -397,11 +395,12 @@ if (mysqli_num_rows($resultParties) > 0) {
             pdtAmount.value = totalAmount;
 
         }
+        // custom code
 
     </script>
     <script src="./JS/filterProductsAjax.js"></script>
     <script src="./JS/purchase-form-table-ajax.js"></script>
-    <script src="./JS/calculateSubtotal.js"></script>
+    <script src="./JS/update-amount.js"></script>
 </body>
 
 </html>
