@@ -14,18 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
         selectedRow.querySelector(".product-quantity");
       if (productRateElement) {
         var productRate = parseInt(productRateElement.value); // or .value if it's an input
-        console.log("Product Rate:", productRate);
 
         // Perform further processing here
       }
       if (productQuantityElement) {
         var productQuantity = parseInt(productQuantityElement.value);
-        console.log("Product Quantity:", productQuantity);
       }
       if (productRateElement && productQuantityElement) {
         rowTotal.innerHTML = productRate * productQuantity;
         calculateSubtotal();
-        console.log(rowTotal.innerHTML);
       }
     }
   });
