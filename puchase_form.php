@@ -28,10 +28,16 @@ $dateValid = $partyNameValid = $brandNameValid = $productNameValid = $rateValid 
 $edit_date = "";
 $edit_party_name = "";
 $edit_brand_name = "";
+$editBrands = [];
+$editProducts = [];
+$editProductRates = [];
+$editProductQuantities = [];
+$amount = "";
 $edit_product_name = "";
 $edit_product_rate = "";
 $edit_product_qty = "";
 $update_id = "";
+$tableRowIndex = "";
 // Function to redirect to the given URL
 function redirect($url)
 {
@@ -46,12 +52,13 @@ if (isset($_REQUEST['update_id'])) {
     if ($result) {
         foreach ($result as $row) {
             $update_id = $row['id'];
-            $edit_date = $row['date_picker'];
-            $edit_party_name = $row['parties_select'];
-            $edit_brand_name = $row['brand_select'];
-            $edit_product_name = $row['product_select'];
-            $edit_product_rate = $row['rate_product'];
-            $edit_product_qty = $row['product_quantity'];
+            $edit_date = $row['purchase_date'];
+            $edit_party_name = $row['party_name'];
+            $edit_brand_name = $row['brand_name'];
+            $edit_product_name = $row['product_name'];
+            $edit_product_rate = $row['product_rate'];
+            echo $edit_product_rate;
+            $edit_product_qty = $row['product_qty'];
 
         }
     }
@@ -66,9 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $pdtRate = ($_POST['products_rate']);
     $pdtQuantity = ($_POST['products_quantity']);
     $pdtAmount = ($_POST['products_amount']);
-    // GT
-
-
     // Validate Date
     if (empty($date) || (!preg_match("/^(\d{4})-(\d{2})-(\d{2})$/", $date))) {
         $dateValid = "is-invalid";
@@ -141,38 +145,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     if ($dateValid == "is-invalid" || $partyNameValid == "is-invalid" || $brandNameValid == "is-invalid" || $productNameValid == "is-invalid" || $rateValid == "is-invalid" || $qtyValid == "is-invalid" || $amountValid == "is-invalid") {
         echo "<script>alert('All fields are required and must be valid.')</script>";
     } else {
+        // Function to handle array to string conversion
+        // Ensuring all variables are strings
+        function ensure_string($var)
+        {
+            if (is_array($var)) {
+                return implode(", ", $var);
+            }
+            return trim($var);  // Ensuring the variable is a string and trimming it
+        }
+        $dateStr = ensure_string($date);
+        $partyNameStr = ensure_string($partyName);
+        $brandNameStr = ensure_string($brandName);
+        $productNameStr = ensure_string($productName);
+        $pdtRateStr = ensure_string($pdtRate);
+        $pdtQuantityStr = ensure_string($pdtQuantity);
+        $pdtAmountStr = ensure_string($pdtAmount);
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $pdtAmountStr = isset($_POST['sub_total']) ? $_POST['sub_total'] : 0;
+        }
         // Check if it's an update operation
         if (isset($_POST['update_id']) && !empty($_POST['update_id'])) {
             $update_id = $_POST['update_id'];
-            $stmt = mysqli_prepare($conn, "UPDATE feedback_form SET name=?, email=?, age=? WHERE id=?");
-            mysqli_stmt_bind_param($stmt, "ssii", $name, $email, $age, $update_id);
+            $stmt = $conn->prepare("UPDATE purchasetable SET purchase_date=?, party_name=?, brand_name=?, product_name=?, product_rate=?, product_qty=?, product_amt=? WHERE id=?");
+            $stmt->bind_param("sssssssi", $dateStr, $partyNameStr, $brandNameStr, $productNameStr, $pdtRateStr, $pdtQuantityStr, $pdtAmountStr, $update_id);
+            $stmt->execute();
             // header("location:feedback_table.php");
+
         } else {
             // Attempt to create table only if it doesn't exist
             $sqlCreatePurchaseTable = " CREATE TABLE IF NOT EXISTS purchasetable ( id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,purchase_date DATE,party_name VARCHAR(255) NOT NULL,brand_name VARCHAR(255) NOT NULL,product_name VARCHAR(255) NOT NULL,product_rate VARCHAR(255) NOT NULL,product_qty VARCHAR(255) NOT NULL,product_amt VARCHAR(255) NOT NULL
  )";
             //  check variables are not arrays before insert
-            // Function to handle array to string conversion
-            function ensure_string($var)
-            {
-                if (is_array($var)) {
-                    return implode(", ", $var);
-                }
-                return trim($var);  // Ensuring the variable is a string and trimming it
-            }
-
-            // Ensuring all variables are strings
-            $dateStr = ensure_string($date);
-            $partyNameStr = ensure_string($partyName);
-            $brandNameStr = ensure_string($brandName);
-            $productNameStr = ensure_string($productName);
-            $pdtRateStr = ensure_string($pdtRate);
-            $pdtQuantityStr = ensure_string($pdtQuantity);
-            $pdtAmountStr = ensure_string($pdtAmount);
-            if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                $pdtAmountStr = isset($_POST['sub_total']) ? $_POST['sub_total'] : 0;
-            }
-
             if (mysqli_query($conn, $sqlCreatePurchaseTable)) {
                 // Inserting new data
                 $query = "INSERT INTO purchasetable (purchase_date, party_name, brand_name, product_name, product_rate, product_qty, product_amt) 
@@ -234,22 +238,32 @@ if (mysqli_num_rows($resultParties) > 0) {
 <body class="d-flex flex-column justify-content-center align-items-center">
     <h1>Purchase <span id="main-title-span">Form</span></h1>
     <form id="purchase-form" class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+        <input type="hidden" name="update_id" value="<?= $update_id ?>">
+        <!-- date -->
         <div class="form-group">
             <label for="date">Date:</label>
-            <input class="form-control" type="date" name="purchase_date" id="purchase-date">
+            <input value="<?= $edit_date ?>" class="form-control" type="date" name="purchase_date" id="purchase-date">
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $dateValid == "is-invalid"): ?>
                 <div class="alert alert-danger">Please enter a valid date.</div>
             <?php endif; ?>
         </div>
+        <!-- Parties Name Select -->
         <div class="row gap-0" id="select-container">
             <div class="form-group col-12 col-lg-4">
                 <label for="parties">Parties:</label>
                 <input type="hidden" name="party_name[]" id="party-name">
                 <select class="w-100" name="parties_select" id="parties-select" onchange="getBrands(this.value)">
-                    <option selected value="">Select a party</option>
+                    <?php if (empty($edit_party_name)): ?>
+                        <option selected value="">Select a Party</option>
+                    <?php else: ?>
+                        <option selected value="<?php echo $edit_party_name; ?>">
+                            <?php echo $edit_party_name; ?>
+                        </option>
+                    <?php endif; ?>
                     <?php echo $partiesOptions; ?>
                 </select>
+
                 <!-- display validation feedback -->
                 <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $partyNameValid == "is-invalid"): ?>
                     <div class="alert alert-danger">Please select a party !</div>
@@ -296,7 +310,7 @@ if (mysqli_num_rows($resultParties) > 0) {
         </div>
         <div class="form-group">
             <label for="quantity">Quantity:</label>
-            <input onkeyup="calculateAmount()" placeholder="Product Qty" class="form-control" type="text"
+            <input value="" onkeyup="calculateAmount()" placeholder="Product Qty" class="form-control" type="text"
                 name="product_quantity" id="product-quantity">
             <!-- display validation feedback -->
             <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $qtyValid == "is-invalid"): ?>
@@ -329,11 +343,54 @@ if (mysqli_num_rows($resultParties) > 0) {
                             <th>Product Name</th>
                             <th>Product Rate</th>
                             <th>Product Quantity</th>
-                            <th>Grand Total</th>
+                            <th>Row Total</th>
                             <th>Function</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
+                        <?php
+                        $index = 0;
+
+                        if (!empty($edit_brand_name)) {
+                            $rowCounter = "1";
+                            $editBrands = explode(',', $edit_brand_name);
+                            $editProducts = explode(',', $edit_product_name);
+                            $editProductRates = explode(',', $edit_product_rate);
+                            $editProductQuantities = explode(',', $edit_product_qty);
+                            print_r($editProductRates);
+                            for ($i = 0; $i < count($editBrands); $i++) {
+                                $index = $i + 1;
+                                $amount = $editProductRates[$i] * $editProductQuantities[$i];
+                                ?>
+                                <tr class="product-row product-row<?php echo $index; ?>">
+                                    <td><?= $rowCounter; ?></td>
+                                    <td><?php echo $editBrands[$i] ?>
+                                        <input type="hidden" name="brands_name[]" value="<?php echo $editBrands[$i] ?>">
+                                    </td>
+                                    <td><?php echo $editProducts[$i] ?>
+                                        <input type="hidden" name="products_name[]" value="<?php echo $editProducts[$i] ?>">
+                                    </td>
+                                    <td>
+                                        <input id="table-rate" class="w-75 product-rate" type="text" name="products_rate[]"
+                                            value="<?php echo $editProductRates[$i] ?>">
+                                    </td>
+                                    <td>
+                                        <input id="table-qty" class="w-75 product-quantity" type="text"
+                                            name="products_quantity[]" value="<?php echo $editProductQuantities[$i] ?>">
+                                    </td>
+                                    <td class="amount"><?php echo $amount; ?>
+                                        <input class="w-75 products-amt" type="hidden" name="products_amount[]">
+                                    </td>
+
+                                    <td class="function">
+                                        <input type="hidden" name="function">
+                                        <button type="button" class="btn btn-outline-danger delete-btn"
+                                            onclick="DeleteRow(<?php echo $rowCounter; ?>)">Delete</button>
+                                    </td>
+                                    <?php $rowCounter++;
+                            }
+                        } ?>
+                        </tr>
                     </tbody>
                     <tfoot>
                         <td colspan="5" class="text-center">Subtotal</td>
@@ -344,7 +401,7 @@ if (mysqli_num_rows($resultParties) > 0) {
             </div>
         </div>
         <button class="btn btn-danger d-block w-50 mx-auto mt-3" type="submit" name="submit">Submit</button>
-
+        <a class="d-block mx-auto mt-3 w-50 btn btn-info" href="./purchase_form_table.php">Go to Table</a>
     </form>
     <?php
     mysqli_close($conn);
@@ -356,6 +413,11 @@ if (mysqli_num_rows($resultParties) > 0) {
     <script>
         const addrowBtn = document.getElementById('addrow-btn')
         let pdtAmount = document.getElementById('product-amount');
+        $(document).ready(function () {
+            <?php if (!empty($update_id)) { ?>
+                calculateSubtotal();
+            <?php } ?>
+        });
         function getBrands(party_id) {
             let post_url = "purchase_form_changes.php?selected_party=" + party_id;
             fetchAndDisplay(post_url, "#brand-select-container");
@@ -385,16 +447,19 @@ if (mysqli_num_rows($resultParties) > 0) {
             }
         }
         function DeleteRow(row_index) {
+            alert("hi");
             if (row_index != "") {
-                if ($('.row' + row_index).length) {
-                    $('.row' + row_index).remove();
+                if ($('.product-row' + row_index).length) {
+                    $('.product-row' + row_index).remove();
                 }
+                calculateSubtotal();
             }
 
         }
+
         function calculateAmount(qty) {
 
-            let pdtQty = document.getElementById('product-quantity');
+            let pdtQty = document.getElementById('table-qty');
             qty = pdtQty.value;
             let pdtRate = document.getElementById('product-rate');
 
@@ -402,7 +467,7 @@ if (mysqli_num_rows($resultParties) > 0) {
             pdtAmount.value = totalAmount;
 
         }
-        // custom code
+
 
     </script>
     <script src="./JS/filterProductsAjax.js"></script>

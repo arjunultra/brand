@@ -37,10 +37,10 @@ $(document).ready(function () {
     jQuery.ajax({
       url: post_url,
       success: function (result) {
-        alert(result);
+        // alert(result);
         if (result != "") {
           if ($("#table-body").find("tr").length > 0) {
-            $("#table-body").find("tr:first").after(result);
+            $("#table-body").find("tr:last").after(result);
             calculateSubtotal();
           } else {
             $("#table-body").append(result);

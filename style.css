@@ -73,7 +73,10 @@ p {
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
-
+#parties-select {
+  background-color: #212529;
+  color: whitesmoke;
+}
 label {
   display: flex;
   align-items: center;

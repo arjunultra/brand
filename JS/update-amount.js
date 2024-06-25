@@ -8,20 +8,21 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedRow = event.target.closest(".product-row");
     let rowTotal = selectedRow.querySelector(".amount");
     if (selectedRow) {
-      // Fetch the product rate from the clicked row
+      // Fetch the product rate from the selected row
       let productRateElement = selectedRow.querySelector(".product-rate");
       let productQuantityElement =
         selectedRow.querySelector(".product-quantity");
       if (productRateElement) {
-        var productRate = parseInt(productRateElement.value); // or .value if it's an input
-
-        // Perform further processing here
+        var productRate = parseInt(productRateElement.value);
       }
       if (productQuantityElement) {
         var productQuantity = parseInt(productQuantityElement.value);
       }
+      console.log(productRate);
+      console.log(productQuantity);
       if (productRateElement && productQuantityElement) {
         rowTotal.innerHTML = productRate * productQuantity;
+        console.log(rowTotal.innerHTML);
         calculateSubtotal();
       }
     }
