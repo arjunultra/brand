@@ -156,6 +156,7 @@ mysqli_close($conn);
 </head>
 
 <body>
+    <?php include 'navbar.php'; ?>
     <h1>Enter Product Details</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">

@@ -44,12 +44,12 @@ if (mysqli_query($conn, $sqlCreateBrands)) { // Check if the table was actually 
 <head>
     <title>Brand Entry Form</title>
     <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="./bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <?php include 'navbar.php'; ?>
     <h1>Enter Brand Details</h1>
     <form method="POST" class="form w-100 text-center">
         <div class="form-group">

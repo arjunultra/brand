@@ -26,7 +26,7 @@ if (!$conn) {
 $sql = "CREATE TABLE IF NOT EXISTS partyorder(id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,party_name VARCHAR(255) NOT NULL,party_mobile VARCHAR(255),brand_name VARCHAR(255) NOT NULL,product_name VARCHAR(255) NOT NULL )";
 if (mysqli_query($conn, $sql)) {
 
-    echo "Table partyorder created successfully";
+    // echo "Table partyorder created successfully";
 } else {
     echo "Error creating table: " . mysqli_error($conn);
 }
@@ -157,6 +157,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
 ?>
 
 <body>
+    <?php include 'navbar.php'; ?>
     <h1>Party Form</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">

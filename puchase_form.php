@@ -235,177 +235,182 @@ if (mysqli_num_rows($resultParties) > 0) {
 
 ?>
 
-<body class="d-flex flex-column justify-content-center align-items-center">
-    <h1>Purchase <span id="main-title-span">Form</span></h1>
-    <form id="purchase-form" class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
-        <input type="hidden" name="update_id" value="<?= $update_id ?>">
-        <!-- date -->
-        <div class="form-group">
-            <label for="date">Date:</label>
-            <input value="<?= $edit_date ?>" class="form-control" type="date" name="purchase_date" id="purchase-date">
-            <!-- display validation feedback -->
-            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $dateValid == "is-invalid"): ?>
-                <div class="alert alert-danger">Please enter a valid date.</div>
-            <?php endif; ?>
-        </div>
-        <!-- Parties Name Select -->
-        <div class="row gap-0" id="select-container">
-            <div class="form-group col-12 col-lg-4">
-                <label for="parties">Parties:</label>
-                <input type="hidden" name="party_name[]" id="party-name">
-                <select class="w-100" name="parties_select" id="parties-select" onchange="getBrands(this.value)">
-                    <?php if (empty($edit_party_name)): ?>
-                        <option selected value="">Select a Party</option>
-                    <?php else: ?>
-                        <option selected value="<?php echo $edit_party_name; ?>">
-                            <?php echo $edit_party_name; ?>
-                        </option>
+<body>
+    <?php include 'navbar.php'; ?>
+    <div class="main-container d-flex flex-column justify-content-center align-items-center">
+        <h1>Purchase <span id="main-title-span">Form</span></h1>
+        <form id="purchase-form" class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+            method="POST">
+            <input type="hidden" name="update_id" value="<?= $update_id ?>">
+            <!-- date -->
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input value="<?= $edit_date ?>" class="form-control" type="date" name="purchase_date"
+                    id="purchase-date">
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $dateValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please enter a valid date.</div>
+                <?php endif; ?>
+            </div>
+            <!-- Parties Name Select -->
+            <div class="row gap-0" id="select-container">
+                <div class="form-group col-12 col-lg-4">
+                    <label for="parties">Parties:</label>
+                    <input type="hidden" name="party_name[]" id="party-name">
+                    <select class="w-100" name="parties_select" id="parties-select" onchange="getBrands(this.value)">
+                        <?php if (empty($edit_party_name)): ?>
+                            <option selected value="">Select a Party</option>
+                        <?php else: ?>
+                            <option selected value="<?php echo $edit_party_name; ?>">
+                                <?php echo $edit_party_name; ?>
+                            </option>
+                        <?php endif; ?>
+                        <?php echo $partiesOptions; ?>
+                    </select>
+
+                    <!-- display validation feedback -->
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $partyNameValid == "is-invalid"): ?>
+                        <div class="alert alert-danger">Please select a party !</div>
                     <?php endif; ?>
-                    <?php echo $partiesOptions; ?>
-                </select>
-
-                <!-- display validation feedback -->
-                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $partyNameValid == "is-invalid"): ?>
-                    <div class="alert alert-danger">Please select a party !</div>
-                <?php endif; ?>
-            </div>
-            <div class="form-group col-12 col-lg-4" id="brand-container">
-                <label for="brand">Brand:</label>
-                <input type="hidden" name="brands_name" id="brand-name">
-                <div id="brand-select-container">
-                    <select class="w-100" name="brand_select" id="brand-select" onchange="getProducts(this.value)">
-                        <option selected value="">Select a Brand</option>
-                        <?php echo $brandOptions; ?>
-                    </select>
                 </div>
-                <!-- display validation feedback -->
-                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $brandNameValid == "is-invalid"): ?>
-                    <div class="alert alert-danger">Please select a brand !</div>
-                <?php endif; ?>
-            </div>
-
-            <div class="form-group col-12 col-lg-4" id="product-container">
-                <label for="product">Product:</label>
-                <input type="hidden" name="product_name" id="product-name">
-                <div id="product-select-container">
-                    <select class="w-100" name="products_select" id="product-select">
-                        <option selected value="">Select a Product</option>
-                        <?php echo $productOptions; ?>
-                    </select>
+                <div class="form-group col-12 col-lg-4" id="brand-container">
+                    <label for="brand">Brand:</label>
+                    <input type="hidden" name="brands_name" id="brand-name">
+                    <div id="brand-select-container">
+                        <select class="w-100" name="brand_select" id="brand-select" onchange="getProducts(this.value)">
+                            <option selected value="">Select a Brand</option>
+                            <?php echo $brandOptions; ?>
+                        </select>
+                    </div>
+                    <!-- display validation feedback -->
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $brandNameValid == "is-invalid"): ?>
+                        <div class="alert alert-danger">Please select a brand !</div>
+                    <?php endif; ?>
                 </div>
+
+                <div class="form-group col-12 col-lg-4" id="product-container">
+                    <label for="product">Product:</label>
+                    <input type="hidden" name="product_name" id="product-name">
+                    <div id="product-select-container">
+                        <select class="w-100" name="products_select" id="product-select">
+                            <option selected value="">Select a Product</option>
+                            <?php echo $productOptions; ?>
+                        </select>
+                    </div>
+                    <!-- display validation feedback -->
+                    <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $productNameValid == "is-invalid"): ?>
+                        <div class="alert alert-danger">Please select a product !</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="form-group col">
+                <label for="rate">Rate:</label>
+                <div id="pdt-rate-container"><input placeholder="Product Rate" class="form-control" type="text"
+                        name="product_rate" id="product-rate" value=""></div>
                 <!-- display validation feedback -->
-                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $productNameValid == "is-invalid"): ?>
-                    <div class="alert alert-danger">Please select a product !</div>
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $rateValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please enter a valid product rate !</div>
                 <?php endif; ?>
             </div>
-        </div>
-        <div class="form-group col">
-            <label for="rate">Rate:</label>
-            <div id="pdt-rate-container"><input placeholder="Product Rate" class="form-control" type="text"
-                    name="product_rate" id="product-rate" value=""></div>
-            <!-- display validation feedback -->
-            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $rateValid == "is-invalid"): ?>
-                <div class="alert alert-danger">Please enter a valid product rate !</div>
-            <?php endif; ?>
-        </div>
-        <div class="form-group">
-            <label for="quantity">Quantity:</label>
-            <input value="" onkeyup="calculateAmount()" placeholder="Product Qty" class="form-control" type="text"
-                name="product_quantity" id="product-quantity">
-            <!-- display validation feedback -->
-            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $qtyValid == "is-invalid"): ?>
-                <div class="alert alert-danger">Please enter a valid product quantity !</div>
-            <?php endif; ?>
-        </div>
-        <div class="form-group">
-            <label for="amount">Amount:</label>
-            <input type="hidden" id="sub-total-hidden" name="sub_total">
-            <input placeholder="Product Amount" class="form-control" type="text" name="product_amount"
-                id="product-amount">
-            <!-- display validation feedback -->
-            <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $amountValid == "is-invalid"): ?>
-                <div class="alert alert-danger">This field cannot be empty!</div>
-            <?php endif; ?>
-        </div>
-        <!-- add button -->
-        <button class="btn btn-outline-warning text-uppercase w-50 mt-3 d-block mx-auto" id="addrow-btn"
-            type="button">Add</button>
-        <!-- table -->
-        <div class="container mt-5">
-            <h2>Party Order Details</h2>
-            <div id="productTable" class="table-responsive">
-                <table id="purchase-table" class="table table-striped table-hover table-bordered">
-                    <input type="hidden" id="row_count" name="row_count" value="0">
-                    <thead class="table-dark bg-primary">
-                        <tr>
-                            <th>S.No</th>
-                            <th>Brand Name</th>
-                            <th>Product Name</th>
-                            <th>Product Rate</th>
-                            <th>Product Quantity</th>
-                            <th>Row Total</th>
-                            <th>Function</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <?php
-                        $index = 0;
-
-                        if (!empty($edit_brand_name)) {
-                            $rowCounter = "1";
-                            $editBrands = explode(',', $edit_brand_name);
-                            $editProducts = explode(',', $edit_product_name);
-                            $editProductRates = explode(',', $edit_product_rate);
-                            $editProductQuantities = explode(',', $edit_product_qty);
-                            print_r($editProductRates);
-                            for ($i = 0; $i < count($editBrands); $i++) {
-                                $index = $i + 1;
-                                $amount = $editProductRates[$i] * $editProductQuantities[$i];
-                                ?>
-                                <tr class="product-row product-row<?php echo $index; ?>">
-                                    <td><?= $rowCounter; ?></td>
-                                    <td><?php echo $editBrands[$i] ?>
-                                        <input type="hidden" name="brands_name[]" value="<?php echo $editBrands[$i] ?>">
-                                    </td>
-                                    <td><?php echo $editProducts[$i] ?>
-                                        <input type="hidden" name="products_name[]" value="<?php echo $editProducts[$i] ?>">
-                                    </td>
-                                    <td>
-                                        <input id="table-rate" class="w-75 product-rate" type="text" name="products_rate[]"
-                                            value="<?php echo $editProductRates[$i] ?>">
-                                    </td>
-                                    <td>
-                                        <input id="table-qty" class="w-75 product-quantity" type="text"
-                                            name="products_quantity[]" value="<?php echo $editProductQuantities[$i] ?>">
-                                    </td>
-                                    <td class="amount"><?php echo $amount; ?>
-                                        <input class="w-75 products-amt" type="hidden" name="products_amount[]">
-                                    </td>
-
-                                    <td class="function">
-                                        <input type="hidden" name="function">
-                                        <button type="button" class="btn btn-outline-danger delete-btn"
-                                            onclick="DeleteRow(<?php echo $rowCounter; ?>)">Delete</button>
-                                    </td>
-                                    <?php $rowCounter++;
-                            }
-                        } ?>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <td colspan="5" class="text-center">Subtotal</td>
-                        <td class="fw-bold">value</td>
-                        <td class="fw-bold display-6" id="sub-total"></td>
-                    </tfoot>
-                </table>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input value="" onkeyup="calculateAmount(this.value)" placeholder="Product Qty" class="form-control"
+                    type="text" name="product_quantity" id="product-quantity">
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $qtyValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">Please enter a valid product quantity !</div>
+                <?php endif; ?>
             </div>
-        </div>
-        <button class="btn btn-danger d-block w-50 mx-auto mt-3" type="submit" name="submit">Submit</button>
-        <a class="d-block mx-auto mt-3 w-50 btn btn-info" href="./purchase_form_table.php">Go to Table</a>
-    </form>
-    <?php
-    mysqli_close($conn);
-    ?>
+            <div class="form-group">
+                <label for="amount">Amount:</label>
+                <input type="hidden" id="sub-total-hidden" name="sub_total">
+                <input placeholder="Product Amount" class="form-control" type="text" name="product_amount"
+                    id="product-amount">
+                <!-- display validation feedback -->
+                <?php if ($_SERVER["REQUEST_METHOD"] == "POST" && $amountValid == "is-invalid"): ?>
+                    <div class="alert alert-danger">This field cannot be empty!</div>
+                <?php endif; ?>
+            </div>
+            <!-- add button -->
+            <button class="btn btn-outline-warning text-uppercase w-50 mt-3 d-block mx-auto" id="addrow-btn"
+                type="button">Add</button>
+            <!-- table -->
+            <div class="container mt-5">
+                <h2>Party Order Details</h2>
+                <div id="productTable" class="table-responsive">
+                    <table id="purchase-table" class="table table-striped table-hover table-bordered">
+                        <input type="hidden" id="row_count" name="row_count" value="0">
+                        <thead class="table-dark bg-primary">
+                            <tr>
+                                <th>S.No</th>
+                                <th>Brand Name</th>
+                                <th>Product Name</th>
+                                <th>Product Rate</th>
+                                <th>Product Quantity</th>
+                                <th>Row Total</th>
+                                <th>Function</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <?php
+                            $index = 0;
+
+                            if (!empty($edit_brand_name)) {
+                                $rowCounter = "1";
+                                $editBrands = explode(',', $edit_brand_name);
+                                $editProducts = explode(',', $edit_product_name);
+                                $editProductRates = explode(',', $edit_product_rate);
+                                $editProductQuantities = explode(',', $edit_product_qty);
+                                print_r($editProductRates);
+                                for ($i = 0; $i < count($editBrands); $i++) {
+                                    $index = $i + 1;
+                                    $amount = $editProductRates[$i] * $editProductQuantities[$i];
+                                    ?>
+                                    <tr class="product-row product-row<?php echo $index; ?>">
+                                        <td><?= $rowCounter; ?></td>
+                                        <td><?php echo $editBrands[$i] ?>
+                                            <input type="hidden" name="brands_name[]" value="<?php echo $editBrands[$i] ?>">
+                                        </td>
+                                        <td><?php echo $editProducts[$i] ?>
+                                            <input type="hidden" name="products_name[]" value="<?php echo $editProducts[$i] ?>">
+                                        </td>
+                                        <td>
+                                            <input id="table-rate" class="w-75 product-rate" type="text" name="products_rate[]"
+                                                value="<?php echo $editProductRates[$i] ?>">
+                                        </td>
+                                        <td>
+                                            <input id="table-qty" class="w-75 product-quantity" type="text"
+                                                name="products_quantity[]" value="<?php echo $editProductQuantities[$i] ?>">
+                                        </td>
+                                        <td class="amount"><?php echo $amount; ?>
+                                            <input class="w-75 products-amt" type="hidden" name="products_amount[]">
+                                        </td>
+
+                                        <td class="function">
+                                            <input type="hidden" name="function">
+                                            <button type="button" class="btn btn-outline-danger delete-btn"
+                                                onclick="DeleteRow(<?php echo $rowCounter; ?>)">Delete</button>
+                                        </td>
+                                        <?php $rowCounter++;
+                                }
+                            } ?>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <td colspan="5" class="text-center">Subtotal</td>
+                            <td class="fw-bold">value</td>
+                            <td class="fw-bold display-6" id="sub-total"></td>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <button class="btn btn-danger d-block w-50 mx-auto mt-3" type="submit" name="submit">Submit</button>
+            <a class="d-block mx-auto mt-3 w-50 btn btn-info" href="./purchase_form_table.php">Go to Table</a>
+        </form>
+        <?php
+        mysqli_close($conn);
+        ?>
+    </div>
     <!-- JQuery -->
     <script src="./JS/jquery-3.7.1.min.js"></script>
     <!-- JS -->
@@ -459,8 +464,7 @@ if (mysqli_num_rows($resultParties) > 0) {
 
         function calculateAmount(qty) {
 
-            let pdtQty = document.getElementById('table-qty');
-            qty = pdtQty.value;
+            let pdtQty = document.getElementById('product-quantity');
             let pdtRate = document.getElementById('product-rate');
 
             let totalAmount = pdtRate.value * pdtQty.value;
