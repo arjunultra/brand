@@ -12,13 +12,13 @@ $conn = mysqli_connect($servername, $username, $password, $dbname);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-$response = "";
 if (isset($_REQUEST['selected_party'])) {
     $partyName = "";
-    $party_list = array();
-    $partyName = $_REQUEST['selected_party'];
-    $productName = $_REQUEST['selected_product'];
-    $brandName = $_REQUEST['selected_brand'];
+    $brandName = "";
+    $productName = "";
+    $partyName = $_REQUEST["selected_party"];
+    $productName = $_REQUEST["selected_product"];
+    $brandName = $_REQUEST["selected_brand"];
 
     $where = "";
 
@@ -28,17 +28,17 @@ if (isset($_REQUEST['selected_party'])) {
 
     if (!empty($brandName)) {
         if (!empty($where)) {
-            $where = $where . "AND FIND_IN_SET('$brandName','brand_name')";
+            $where = $where . "AND FIND_IN_SET ('$brandName',brand_name)";
         } else {
-            $where = "FIND_IN_SET('$brandName','brand_name')";
+            $where = "FIND_IN_SET('$brandName',brand_name)";
         }
     }
 
     if (!empty($productName)) {
         if (!empty($where)) {
-            $where = $where . "AND FIND_IN_SET('$productName','brand_name')";
+            $where .= "AND FIND_IN_SET('$productName',product_name)";
         } else {
-            $where = "FIND_IN_SET('$productName','brand_name')";
+            $where = "FIND_IN_SET('$productName',product_name)";
         }
     }
 

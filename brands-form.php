@@ -49,7 +49,7 @@ if (mysqli_query($conn, $sqlCreateBrands)) { // Check if the table was actually 
 </head>
 
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include 'sidebar.php'; ?>
     <h1>Enter Brand Details</h1>
     <form method="POST" class="form w-100 text-center">
         <div class="form-group">

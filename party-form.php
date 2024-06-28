@@ -157,7 +157,7 @@ if (mysqli_num_rows($resultProducts) > 0) {
 ?>
 
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include 'sidebar.php'; ?>
     <h1>Party Form</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="form w-100 text-center">
         <div class="form-group">

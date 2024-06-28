@@ -236,7 +236,7 @@ if (mysqli_num_rows($resultParties) > 0) {
 ?>
 
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include 'sidebar.php'; ?>
     <div class="main-container d-flex flex-column justify-content-center align-items-center">
         <h1>Purchase <span id="main-title-span">Form</span></h1>
         <form id="purchase-form" class="w-50" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"

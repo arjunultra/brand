@@ -13,10 +13,21 @@
 *::after {
   box-sizing: border-box;
 }
-nav ul li a {
-  color: #6850bd;
+.offcanvas-body > .container-fluid > ul > li > a {
+  color: whitesmoke;
+  background-color: #6850bd;
+  display: block;
+  width: 20vw;
+  text-align: center;
+  padding: 1em 0;
 }
-
+.offcanvas-header > button.btn-close {
+  color: var(--color-red) !important;
+}
+.offcanvas-body > .container-fluid > ul > li > a:hover {
+  color: #f6449f;
+  transition: 0.5s;
+}
 body {
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
