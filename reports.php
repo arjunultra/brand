@@ -1,13 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
 <?php
 $servername = "localhost";
 $username = "root";
@@ -67,6 +57,7 @@ function getPurchaseList($partyName, $brandName, $productName)
     // echo $partyName . "///";
     $where = "";
     global $conn;
+    print_r($brandName);
 
     if (!empty($partyName)) {
         $where = $where . "party_name ='$partyName'";
@@ -76,20 +67,21 @@ function getPurchaseList($partyName, $brandName, $productName)
         if (!empty($where)) {
             $where = $where . " AND FIND_IN_SET ('$brandName',brand_name)";
         } else {
-            $where = "FIND_IN_SET('$brandName',brand_name)";
+            $where = " FIND_IN_SET('$brandName',brand_name)";
         }
     }
 
     if (!empty($productName)) {
         if (!empty($where)) {
-            $where .= "AND FIND_IN_SET('$productName',product_name)";
+            $where = $where . " AND FIND_IN_SET('$productName',product_name)";
         } else {
             $where = "FIND_IN_SET('$productName',product_name)";
         }
     }
 
     if (!empty($where)) {
-        $query = "SELECT * FROM purchasetable WHERE " . $where . "";
+
+        echo $query = "SELECT * FROM purchasetable WHERE " . $where . "";
     } else {
         $query = "SELECT * FROM purchasetable";
     }
@@ -97,6 +89,7 @@ function getPurchaseList($partyName, $brandName, $productName)
 
     return $result;
 }
+
 
 
 
@@ -111,6 +104,17 @@ $result = getPurchaseList($partyName, $brandName, $productName);
 
 
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
 <script src="./JS/jquery-3.7.1.min.js"></script>
 
 <body>

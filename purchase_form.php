@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         function ensure_string($var)
         {
             if (is_array($var)) {
-                return implode(", ", $var);
+                return implode(",", $var);
             }
             return trim($var);  // Ensuring the variable is a string and trimming it
         }

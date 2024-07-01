@@ -116,10 +116,10 @@ if (mysqli_num_rows($resultProducts) > 0) {
                                 <td><?php echo $row["product_rate"] ?></td>
                                 <td><?php echo $row["product_qty"] ?></td>
                                 <td><?php echo $row["product_amt"] ?></td>
-                                <td class='d-flex justify-content-start'>
-                                    <a target="_blank" class="btn btn-outline-primary d-block w-50 me-2"
+                                <td class='d-flex gap-2 p-3 pe-4'>
+                                    <a target="_blank" class="btn col-6 btn-outline-primary"
                                         href="purchase_form.php?update_id=<?php echo $row['id']; ?>">UPDATE</a>
-                                    <a class="btn btn-danger d-block w-50"
+                                    <a class="col-6 btn btn-danger"
                                         href="purchase_form_table.php?delete_id=<?php echo $row['id']; ?>">DELETE</a>
                                 </td>
                             </tr>
